@@ -1,0 +1,3 @@
+[submodule "fpxlib3d"]
+	path = modules/fpxlib3d
+	url = https://git.goodgirl.dev/foorpyxof/fpxlib3d.git
