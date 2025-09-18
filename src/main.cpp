@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "engine.hpp"
 #include "engine/Entity3D.hpp"
 #include "engine/Renderer.hpp"

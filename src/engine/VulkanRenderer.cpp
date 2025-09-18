@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "engine/VulkanRenderer.hpp"
 #include "engine/Renderer.hpp"
 

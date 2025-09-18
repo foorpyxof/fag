@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "engine/SceneManager.hpp"
 #include "engine/Scene.hpp"
 

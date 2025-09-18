@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "engine/Engine.hpp"
 #include "engine/Renderer.hpp"
 #include "engine/SceneManager.hpp"
@@ -43,12 +46,12 @@ int Engine::start(void) {
    * Engine startup code goes here!
    */
 
-  FAG_DEBUG("Entering engine loop!");
-  while (!m_ShouldStop) {
-    /*
-     * Engine loop code goes here!
-     */
-  }
+  // FAG_DEBUG("Entering engine loop!");
+  // while (!m_ShouldStop) {
+  //   /*
+  //    * Engine loop code goes here!
+  //    */
+  // }
 
   _teardown();
 

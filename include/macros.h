@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Erynn Scholtes
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef FAG_MACROS_H
 #define FAG_MACROS_H
 

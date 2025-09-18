@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Erynn Scholtes
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef FAG_DEBUG_H
 #define FAG_DEBUG_H
 
