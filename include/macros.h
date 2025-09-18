@@ -9,7 +9,7 @@
     FAG_LINE_INFO(_fag_lineinfo_output_buffer);                                \
     FAG_DEBUG("Variable %s is unused (at: %s)", #_var,                         \
               _fag_lineinfo_output_buffer);                                    \
-    if (_var) {                                                                \
+    if (&_var) {                                                               \
     }                                                                          \
   }
 

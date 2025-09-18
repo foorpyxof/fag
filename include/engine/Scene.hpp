@@ -13,8 +13,8 @@ public:
   typedef LoadResult (*LoadCallback)(Scene *);
 
 public:
-  void set_loading_callback(LoadCallback);
-  void set_unloading_callback(LoadCallback);
+  void set_loader(LoadCallback);
+  void set_unloader(LoadCallback);
 
   // use these methods in your Loading callback
   bool load_from_gltf(const char *path);

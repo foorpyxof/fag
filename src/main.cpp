@@ -1,4 +1,6 @@
 #include "engine.hpp"
+#include "engine/Entity3D.hpp"
+#include "engine/Renderer.hpp"
 #include "engine/Scene.hpp"
 
 extern "C" {
@@ -7,31 +9,38 @@ extern "C" {
 
 #include <cstdio>
 
-using namespace fag;
-
-Scene::LoadResult my_scene_loader(Scene *to_load) {
+fag::Scene::LoadResult my_scene_loader(fag::Scene *to_load) {
   UNUSED(to_load);
 
-  return Scene::LoadResult::Success;
+  return fag::Scene::LoadResult::Success;
 }
 
-Scene::LoadResult my_scene_unloader(Scene *to_load) {
+fag::Scene::LoadResult my_scene_unloader(fag::Scene *to_load) {
   UNUSED(to_load);
 
-  return Scene::LoadResult::Success;
+  return fag::Scene::LoadResult::Success;
 }
+
+class MyEntity3D : public fag::Entity3D {
+public:
+  MyEntity3D() { printf("fagballs\n"); }
+  ~MyEntity3D() { printf("goodbye !\n"); }
+};
 
 int main(void) {
-  Engine *engine = Engine::get_singleton();
+  fag::Engine *engine = fag::Engine::get_singleton();
   printf("%p\n", (void *)engine);
 
-  engine->start();
-
-  Scene my_scene;
-  my_scene.set_loading_callback(my_scene_loader);
-  my_scene.set_unloading_callback(my_scene_unloader);
+  fag::Scene my_scene;
+  my_scene.set_loader(my_scene_loader);
+  my_scene.set_unloader(my_scene_unloader);
 
   engine->add_scene(my_scene);
 
-  Engine::destroy_singleton();
+  // it uses Vulkan by default (since that is the only option)
+  // but you know, just in case
+  engine->renderBackend = fag::Renderer::Backend::Vulkan;
+  engine->start();
+
+  fag::Engine::destroy_singleton();
 }

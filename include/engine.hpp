@@ -10,5 +10,6 @@
 #include "./engine/SceneManager.hpp"
 #include "./engine/Transforms.hpp"
 #include "./engine/Vectors.hpp"
+#include "./engine/VulkanRenderer.hpp"
 
 #endif // FAG_ENGINE_HPP

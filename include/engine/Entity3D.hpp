@@ -10,6 +10,7 @@ namespace fag {
 class Entity3D : public Entity {
 public:
   Entity3D();
+  virtual ~Entity3D();
 
   virtual void update();
   virtual void fixed_update();
