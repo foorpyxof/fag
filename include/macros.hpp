@@ -6,7 +6,13 @@
 #ifndef FAG_MACROS_H
 #define FAG_MACROS_H
 
+#include "./general.hpp"
 #include "debug.h"
+
+#include <stdexcept>
+#include <string>
+
+extern "C" {
 
 #ifdef IMPLEMENT_THIS
 #undef IMPLEMENT_THIS
@@ -43,5 +49,20 @@
 #undef ARRAY_SIZE
 #endif
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(*arr))
+}
+
+#ifdef THROW_ON_FAIL
+#undef THROW_ON_FAIL
+#endif
+#define THROW_ON_FAIL(_result)                                                 \
+  if (_result < fag::Result::Success) {                                        \
+    char _fag_lineinfo_output_buffer[sizeof(__FILE__) + 16];                   \
+    FAG_LINE_INFO(_fag_lineinfo_output_buffer);                                \
+    const char *_temp_msg = "A function failed at runtime. (at: ";             \
+    std::string message = _temp_msg;                                           \
+    message.append(_fag_lineinfo_output_buffer);                               \
+    message.append(")");                                                       \
+    throw std::runtime_error(message);                                         \
+  }
 
 #endif // FAG_MACROS_H

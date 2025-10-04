@@ -30,12 +30,15 @@ $(LIBRARY_FOLDER):
 $(MODULES_DIR)/%:
 	./scripts/update-submodules.sh
 
-# $(MODULES_DIR)/fpxlibc/build/lib/%$(LIB_EXT): | $(MODULES_DIR)/fpxlibc
-# 	cd $|; $(MAKE) $(subst $(MODULES_DIR)/fpxlibc/,,$@)
+$(MODULES_DIR)/fpxlib3d/build/lib/%$(LIB_EXT): | $(MODULES_DIR)/fpxlib3d
+	cd $|; $(MAKE) $(subst $(MODULES_DIR)/fpxlib3d/,,$@)
 
-# for the model library
-# $(LIBRARY_FOLDER)/$(LIB_PREFIX)model$(LIB_EXT): $(MODEL_DEPS)
-# $(LIBRARY_FOLDER)/$(LIB_PREFIX)model$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(MODEL_DEPS))
+ENGINE_DEPS := vk window general
+ENGINE_DEPS := $(foreach dep,$(ENGINE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx3d_$(dep)$(LIB_EXT))
+
+# for the Vulkan renderer
+$(LIBRARY_FOLDER)/$(LIB_PREFIX)engine$(LIB_EXT): $(ENGINE_DEPS)
+$(LIBRARY_FOLDER)/$(LIB_PREFIX)engine$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(ENGINE_DEPS))
 
 define new-lib-target
 

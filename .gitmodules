@@ -1,3 +1,6 @@
 [submodule "fpxlib3d"]
 	path = modules/fpxlib3d
 	url = https://git.goodgirl.dev/foorpyxof/fpxlib3d.git
+[submodule "glfw"]
+	path = modules/glfw
+	url = https://github.com/glfw/glfw.git

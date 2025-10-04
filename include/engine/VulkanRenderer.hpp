@@ -5,16 +5,9 @@
 #define FAG_ENGINE_VULKANRENDERER_HPP
 
 #include "./Renderer.hpp"
-#include <vulkan/vulkan_core.h>
 
 extern "C" {
-#include "fpxlib3d/include/vk/context.h"
-#include "fpxlib3d/include/vk/pipeline.h"
-#include "fpxlib3d/include/vk/shape.h"
-#include "fpxlib3d/include/vk/swapchain.h"
-
-#include "fpxlib3d/include/vk/typedefs.h"
-#include "fpxlib3d/include/window/window.h"
+#include "fpxlib3d/include/vk.h"
 }
 
 #include <array>
@@ -51,12 +44,11 @@ public:
   void set_shapes(const vector<VulkanRenderer::Shape *> &);
 
 private:
-  Fpx3d_Vk_SwapchainRequirements m_SwapchainRequirements;
+  void _vulkan_setup();
+  void _glfw_setup();
+  void _gpu_setup();
 
-  VkSurfaceFormatKHR m_VulkanSurfaceFormats[1] = {
-      {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}};
-  VkPresentModeKHR m_VulkanPresentModes[1] = {VK_PRESENT_MODE_FIFO_KHR};
-
+private:
   Fpx3d_Vk_Context m_VulkanContext;
   Fpx3d_Wnd_Context m_WindowContext;
 

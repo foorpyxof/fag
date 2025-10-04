@@ -7,7 +7,7 @@
 #include "engine/VulkanRenderer.hpp"
 
 extern "C" {
-#include "macros.h"
+#include "macros.hpp"
 }
 
 #include <cstdlib>
