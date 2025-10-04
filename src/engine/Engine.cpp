@@ -40,8 +40,6 @@ void Engine::destroy_singleton(void) {
 
 /* public instance methods */
 int Engine::start(void) {
-  _renderer_setup();
-
   /*
    * Engine startup code goes here!
    */
@@ -78,13 +76,6 @@ Engine::Engine()
   }
 }
 Engine::~Engine(void) {}
-
-void Engine::_renderer_setup(void) {
-  NULL_CHECK(m_Renderer,
-             FAG_ERROR("Tried to set up renderer, but it is 'nullptr'");
-             throw std::runtime_error("renderer pointer invalid"));
-  m_Renderer->initialize();
-}
 
 void Engine::_teardown(void) {
   FAG_DEBUG("Destroying F.A.G. engine");

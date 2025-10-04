@@ -10,20 +10,14 @@ class Renderer {
 public:
   enum class Backend { Vulkan };
 
-  struct Shape {
-    // union {
-    //   // Fpx3d_Vk_Shape vulkanShape;
-    //   // ...
-    // };
-  };
+  struct Shape {};
 
 public:
   virtual ~Renderer(void) {};
 
-  virtual void initialize(void) = 0;
   virtual void render_frame(void) = 0;
 
-  virtual Backend get_backend(void) = 0;
+  virtual Backend get_backend(void) const = 0;
 };
 
 } // namespace fag

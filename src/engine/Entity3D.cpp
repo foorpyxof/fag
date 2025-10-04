@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include "engine/Entity3D.hpp"
+#include "engine/Entity.hpp"
 #include "engine/Transforms.hpp"
 
 namespace fag {
 
-Entity3D::Entity3D() : m_Transform(), m_TransformHasChanged(true) {}
+Entity3D::Entity3D() : m_Transform(), m_TransformHasChanged(true) {
+  _set_basetype(Entity::Basetype::Entity3D);
+}
 Entity3D::~Entity3D() {}
 
 void Entity3D::update() {}

@@ -38,7 +38,6 @@ private:
   Engine(void);
   ~Engine(void);
 
-  void _renderer_setup(void);
   void _teardown(void);
 
 private:

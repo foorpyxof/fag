@@ -35,7 +35,7 @@ bool SceneManager::load_scene_at(size_t index) {
   }
 
   FAG_DEBUG("Loading scene at index %" LONG_FORMAT "u", index);
-  if (Scene::LoadResult::Success != scene._load(&scene)) {
+  if (Scene::LoadResult::Success != scene._load(scene)) {
     std::string msg = "Failed to load scene at index ";
     msg += std::to_string(index);
 
@@ -64,7 +64,7 @@ bool SceneManager::unload_scene_at(size_t index) {
 
   FAG_DEBUG("Unloading scene at index %" LONG_FORMAT "u", index);
 
-  scene._unload(&scene);
+  scene._unload(scene);
   scene.m_IsLoaded = false;
 
   return true;

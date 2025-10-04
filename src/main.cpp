@@ -12,13 +12,13 @@ extern "C" {
 
 #include <cstdio>
 
-fag::Scene::LoadResult my_scene_loader(fag::Scene *to_load) {
+fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
   UNUSED(to_load);
 
   return fag::Scene::LoadResult::Success;
 }
 
-fag::Scene::LoadResult my_scene_unloader(fag::Scene *to_load) {
+fag::Scene::LoadResult my_scene_unloader(fag::Scene &to_load) {
   UNUSED(to_load);
 
   return fag::Scene::LoadResult::Success;
@@ -31,6 +31,10 @@ public:
 };
 
 int main(void) {
+  // it uses Vulkan by default (since that is the only option)
+  // but you know, just in case
+  fag::Engine::renderBackend = fag::Renderer::Backend::Vulkan;
+
   fag::Engine *engine = fag::Engine::get_singleton();
   printf("%p\n", (void *)engine);
 
@@ -40,9 +44,6 @@ int main(void) {
 
   engine->add_scene(my_scene);
 
-  // it uses Vulkan by default (since that is the only option)
-  // but you know, just in case
-  engine->renderBackend = fag::Renderer::Backend::Vulkan;
   engine->start();
 
   fag::Engine::destroy_singleton();

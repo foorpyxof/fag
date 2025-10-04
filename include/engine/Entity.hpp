@@ -6,12 +6,14 @@
 
 #include "engine/typedefs.h"
 
-#include <cstring>
 #include <string>
 
 namespace fag {
 
 class Entity {
+public:
+  enum class Basetype { Entity2D, Entity3D };
+
 public:
   Entity(void);
   virtual ~Entity(void) = 0;
@@ -22,8 +24,14 @@ public:
   const std::string &get_name() const;
   void set_name(const char *);
 
+  Basetype get_basetype() const;
+
+protected:
+  void _set_basetype(Basetype);
+
 private:
   std::string m_Name;
+  Basetype m_Basetype;
 
 public:
   template <class Old, class New> static New *promote(Old *from, Allocator *a) {

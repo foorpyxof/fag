@@ -13,7 +13,7 @@ class SceneManager;
 class Scene {
 public:
   enum class LoadResult : int { Success = 0, Failure = -1 };
-  typedef LoadResult (*LoadCallback)(Scene *);
+  typedef LoadResult (*LoadCallback)(Scene &);
 
 public:
   void set_loader(LoadCallback);
