@@ -10,13 +10,13 @@ class Renderer {
 public:
   enum class Backend { Vulkan };
 
+  struct Shader {};
   struct Shape {};
 
 public:
   virtual ~Renderer(void) {};
 
   virtual void render_frame(void) = 0;
-
   virtual Backend get_backend(void) const = 0;
 };
 

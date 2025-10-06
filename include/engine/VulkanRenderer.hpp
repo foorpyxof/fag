@@ -4,28 +4,33 @@
 #ifndef FAG_ENGINE_VULKANRENDERER_HPP
 #define FAG_ENGINE_VULKANRENDERER_HPP
 
-#include "./Renderer.hpp"
-
+#include <functional>
 extern "C" {
 #include "fpxlib3d/include/vk.h"
 }
 
-#include <array>
+#include "./Renderer.hpp"
+
 #include <cstddef>
 #include <limits>
+#include <unordered_map>
 #include <vector>
-
-using std::array;
-using std::vector;
 
 namespace fag {
 
 class VulkanRenderer : public Renderer {
+
+public:
+  static VulkanRenderer *get_singleton(void);
+  static void destroy_singleton(void);
+
 public:
   enum PipelineIndex : size_t {
     Default3D = std::numeric_limits<size_t>::max(),
     Default2D = std::numeric_limits<size_t>::max() - 1,
   };
+
+  struct Shader : public Renderer::Shader {};
 
   struct Shape : public Renderer::Shape {
   public:
@@ -33,26 +38,42 @@ public:
   };
 
 public:
-  VulkanRenderer(void);
-  ~VulkanRenderer(void);
-
   void render_frame(void);
   Backend get_backend(void) const;
 
 public:
   void select_pipeline(size_t idx);
-  void set_shapes(const vector<VulkanRenderer::Shape *> &);
+  void set_shapes(const std::vector<VulkanRenderer::Shape *> &);
 
 private:
-  void _vulkan_setup();
-  void _glfw_setup();
-  void _gpu_setup();
+  static VulkanRenderer *m_Singleton;
+
+  struct PipelineLayoutCreator {
+    std::vector<Fpx3d_Vk_DescriptorSetLayout> descriptorSetLayouts;
+  };
+
+private:
+  VulkanRenderer(void);
+  ~VulkanRenderer(void);
+
+  void _vulkan_setup(void);
+  void _glfw_setup(void);
+  void _gpu_setup(void);
+
+  void _create_default3d_pipeline_layout(void);
+  void _create_default2d_pipeline_layout(void);
+
+  void _create_pipeline_layouts(void);
+  void _create_base_pipelines(void);
 
 private:
   Fpx3d_Vk_Context m_VulkanContext;
   Fpx3d_Wnd_Context m_WindowContext;
 
-  vector<Fpx3d_Vk_Pipeline *> m_Pipelines;
+  Fpx3d_Vk_PipelineLayout m_Default2DPipelineLayout;
+  Fpx3d_Vk_PipelineLayout m_Default3DPipelineLayout;
+
+  std::vector<Fpx3d_Vk_Pipeline *> m_Pipelines;
   Fpx3d_Vk_Pipeline *m_SelectedPipeline = nullptr;
 };
 

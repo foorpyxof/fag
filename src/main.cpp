@@ -7,6 +7,7 @@ extern "C" {
 #include "macros.hpp"
 }
 
+#include <chrono>
 #include <cstdio>
 
 fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
@@ -33,7 +34,6 @@ int main(void) {
   fag::Engine::renderBackend = fag::Renderer::Backend::Vulkan;
 
   fag::Engine *engine = fag::Engine::get_singleton();
-  printf("%p\n", (void *)engine);
 
   fag::Scene my_scene;
   my_scene.set_loader(my_scene_loader);

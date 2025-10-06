@@ -72,7 +72,7 @@ Engine::Engine()
       m_SceneManager(new SceneManager) {
   switch (Engine::renderBackend) {
   case Renderer::Backend::Vulkan:
-    m_Renderer = new VulkanRenderer;
+    m_Renderer = VulkanRenderer::get_singleton();
   }
 }
 Engine::~Engine(void) {}
