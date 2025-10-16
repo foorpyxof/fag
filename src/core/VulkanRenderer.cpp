@@ -1,22 +1,21 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/VulkanRenderer.hpp"
+#include "core/VulkanRenderer.hpp"
 
-#include "fpxlib3d/include/vk/descriptors.h"
-#include "fpxlib3d/include/vk/logical_gpu.h"
-#include "fpxlib3d/include/vk/pipeline.h"
-#include "fpxlib3d/include/vk/typedefs.h"
+#include "dev/allocators.hpp"
+
 #include "macros.hpp"
-#include <initializer_list>
-#include <stdexcept>
 
 extern "C" {
 #include "fpxlib3d/include/vk.h"
+#include "fpxlib3d/include/vk/typedefs.h"
 }
 
 #include "glfw/include/GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
+
+#include <stdexcept>
 
 static bool s_VulkanSettingsInitialized = false;
 
@@ -33,7 +32,7 @@ static Fpx3d_Vk_DescriptorSetBinding s_default3d_object_bindings[2]{};
 static Fpx3d_Vk_DescriptorSetBinding s_default2d_pipeline_bindings[1]{};
 static Fpx3d_Vk_DescriptorSetBinding s_default2d_object_bindings[2]{};
 
-static int s_gpu_scoring_function(Fpx3d_Vk_Context *, VkPhysicalDevice);
+static int s_gpu_scoring_function(Fpx3d_Vk_Context *, Fpx3d_Vk_PhysicalDevice);
 static struct fpx3d_wnd_dimensions s_window_resize_callback(void *window_ptr);
 
 struct default3d_object_descriptor_bindings {
@@ -59,7 +58,7 @@ VulkanRenderer *VulkanRenderer::m_Singleton = nullptr;
 /* public static methods */
 VulkanRenderer *VulkanRenderer::get_singleton(void) {
   if (nullptr == VulkanRenderer::m_Singleton)
-    VulkanRenderer::m_Singleton = new VulkanRenderer;
+    VulkanRenderer::m_Singleton = FAG_HEAP_CONSTRUCT(VulkanRenderer);
 
   return VulkanRenderer::m_Singleton;
 }
@@ -72,21 +71,6 @@ void VulkanRenderer::destroy_singleton(void) {
   VulkanRenderer::m_Singleton = nullptr;
 }
 
-// XXX: change this when there's more default pipelines!
-// (based on enum class VulkanRenderer::PipelineIndex)
-#define BASE_PIPELINE_COUNT 2
-
-static size_t s_convert_pipeline_index(size_t idx) {
-  switch (idx) {
-  case VulkanRenderer::PipelineIndex::Default2D:
-  case VulkanRenderer::PipelineIndex::Default3D:
-    return std::numeric_limits<size_t>::max() - idx;
-
-  default:
-    return idx + BASE_PIPELINE_COUNT;
-  }
-}
-
 #define INIT_WINDOW_WIDTH 500
 #define INIT_WINDOW_HEIGHT 500
 
@@ -94,12 +78,13 @@ static size_t s_convert_pipeline_index(size_t idx) {
 
 IMPLEMENT_THIS(void VulkanRenderer::render_frame(void), );
 
-Renderer::Backend VulkanRenderer::get_backend(void) const {
-  return Renderer::Backend::Vulkan;
-}
+IMPLEMENT_THIS(std::weak_ptr<Renderer::Shader> VulkanRenderer::create_shader(
+                   std::string &resource_path, ShaderStage stage_flags),
+               UNUSED(resource_path);
+               UNUSED(stage_flags); return {};);
 
-void VulkanRenderer::select_pipeline(size_t idx) {
-  size_t real_index = s_convert_pipeline_index(idx);
+void VulkanRenderer::select_render_context(size_t idx) {
+  size_t real_index = _convert_render_context_index(idx);
 
   if (real_index >= m_Pipelines.size())
     return;
@@ -107,10 +92,11 @@ void VulkanRenderer::select_pipeline(size_t idx) {
   m_SelectedPipeline = m_Pipelines[real_index];
 }
 IMPLEMENT_THIS(void VulkanRenderer::set_shapes(
-                   const std::vector<VulkanRenderer::Shape *> &shapes),
+                   const std::vector<VulkanRenderer::Mesh *> &shapes),
                UNUSED(shapes););
 
-VulkanRenderer::VulkanRenderer(void) : m_Pipelines(BASE_PIPELINE_COUNT) {
+VulkanRenderer::VulkanRenderer(void)
+    : m_Pipelines(Renderer::BASE_RENDER_CONTEXT_COUNT) {
   UNUSED(m_VulkanContext);
 
   if (!s_VulkanSettingsInitialized) {
@@ -301,43 +287,47 @@ void VulkanRenderer::_create_base_pipelines(void) {
   fpx3d_vk_create_framebuffers(sc, &m_VulkanContext, lgpu, renderpass);
 }
 
+Renderer::Mesh *VulkanRenderer::Mesh::clone(void) {
+  VulkanRenderer::Mesh *cloned_mesh = FAG_HEAP_CONSTRUCT(VulkanRenderer::Mesh);
+
+  cloned_mesh->m_VulkanShapeBuffer = m_VulkanShapeBuffer;
+
+  return cloned_mesh;
+}
+
 } // namespace fag
 
 // STATIC FUNCTIONS DEFINED BELOW
 
 static int s_gpu_scoring_function(Fpx3d_Vk_Context *vk_ctx,
-                                  VkPhysicalDevice gpu) {
+                                  Fpx3d_Vk_PhysicalDevice gpu) {
   int score = 200;
   float multiplier = 1.0f;
 
-  VkPhysicalDeviceProperties dev_props{};
-  VkPhysicalDeviceFeatures dev_feats{};
-
-  vkGetPhysicalDeviceProperties(gpu, &dev_props);
-  vkGetPhysicalDeviceFeatures(gpu, &dev_feats);
-
-  switch (dev_props.deviceType) {
+  switch (gpu.properties.deviceType) {
   case VK_PHYSICAL_DEVICE_TYPE_CPU:
     multiplier = 0.2f;
     break;
 
   case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
     multiplier = 2.0f;
+    break;
 
   case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
     multiplier = 1.3f;
+    break;
 
   default:
     multiplier = 1.0f;
     break;
   }
 
-  if (!dev_feats.geometryShader)
+  if (!gpu.features.geometryShader)
     return 0;
 
   {
     Fpx3d_Vk_SwapchainProperties sc_props =
-        fpx3d_vk_create_swapchain_properties(vk_ctx, gpu,
+        fpx3d_vk_create_swapchain_properties(vk_ctx, gpu.handle,
                                              s_SwapchainRequirements);
 
     if (!(sc_props.presentModeValid && sc_props.surfaceFormatValid))

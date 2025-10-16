@@ -1,16 +1,17 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_ENTITY3D_HPP
-#define FAG_ENGINE_ENTITY3D_HPP
+#ifndef FAG_CORE_ENTITY3D_HPP
+#define FAG_CORE_ENTITY3D_HPP
 
 #include "./Entity.hpp"
+#include "./Drawable.hpp"
 #include "./Transforms.hpp"
 #include "./Vectors.hpp"
 
 namespace fag {
 
-class Entity3D : public Entity {
+class Entity3D : public Entity, Drawable {
 public:
   Entity3D();
   virtual ~Entity3D();
@@ -30,4 +31,4 @@ private:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_ENTITY3D_HPP
+#endif // FAG_CORE_ENTITY3D_HPP

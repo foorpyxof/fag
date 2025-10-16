@@ -1,8 +1,8 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_SCENE_HPP
-#define FAG_ENGINE_SCENE_HPP
+#ifndef FAG_CORE_SCENE_HPP
+#define FAG_CORE_SCENE_HPP
 
 #include <string>
 
@@ -34,4 +34,4 @@ private:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_SCENE_HPP
+#endif // FAG_CORE_SCENE_HPP

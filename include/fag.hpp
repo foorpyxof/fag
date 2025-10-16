@@ -1,8 +1,10 @@
 #ifndef FAG_HPP
 #define FAG_HPP
 
-#include "./engine.hpp"
+#include "./core.hpp"
+#include "./error.hpp"
 #include "./general.hpp"
+#include "./os.hpp"
 
 #undef THROW_ON_FAIL
 #undef DEEZ_NUTSsAKDHSUKAHDLSAJ

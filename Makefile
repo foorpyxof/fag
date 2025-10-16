@@ -39,6 +39,7 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 
 	# mingw/bin/libwinpthread.dll.a import library
 	LDFLAGS += -lwinpthread.dll
+	LDFLAGS += -lglfw3
 	
 	EXE_EXT := .exe
 	OBJ_EXT := .obj

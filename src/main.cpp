@@ -1,14 +1,16 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "core/Renderer.hpp"
+#include "core/VulkanRenderer.hpp"
 #include "fag.hpp"
 
 extern "C" {
 #include "macros.hpp"
 }
 
-#include <chrono>
 #include <cstdio>
+#include <iostream>
 
 fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
   UNUSED(to_load);
@@ -29,11 +31,13 @@ public:
 };
 
 int main(void) {
-  // it uses Vulkan by default (since that is the only option)
-  // but you know, just in case
-  fag::Engine::renderBackend = fag::Renderer::Backend::Vulkan;
-
   fag::Engine *engine = fag::Engine::get_singleton();
+  fag::Renderer *renderer = fag::VulkanRenderer::get_singleton();
+  engine->assign_renderer(renderer);
+
+  std::cout << "Renderer is VulkanRenderer? ";
+  std::cout << (renderer->is<fag::VulkanRenderer>() ? "yes" : "no")
+            << std::endl;
 
   fag::Scene my_scene;
   my_scene.set_loader(my_scene_loader);

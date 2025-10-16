@@ -1,7 +1,7 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/Scene.hpp"
+#include "core/Scene.hpp"
 
 namespace fag {
 

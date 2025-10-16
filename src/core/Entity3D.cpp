@@ -1,9 +1,9 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/Entity3D.hpp"
-#include "engine/Entity.hpp"
-#include "engine/Transforms.hpp"
+#include "core/Entity3D.hpp"
+#include "core/Entity.hpp"
+#include "core/Transforms.hpp"
 
 namespace fag {
 

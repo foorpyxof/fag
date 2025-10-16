@@ -1,6 +1,6 @@
 ZIPS_DIR := archives
 
-ZIP_FILE_NAME := fpxlib3d
+ZIP_FILE_NAME := fag_engine
 DONT_ZIP_DIRS := .git .cache scripts $(ZIPS_DIR) $(MODULES_DIR) $(OBJECTS_FOLDER)
 DONT_ZIP_FILES := $(RELEASE_APP) $(DEBUG_APP) compile_commands.json .gitattributes .gitignore .copywrite.hcl
 

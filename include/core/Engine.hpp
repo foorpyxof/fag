@@ -1,10 +1,11 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_ENGINE_HPP
-#define FAG_ENGINE_ENGINE_HPP
+#ifndef FAG_CORE_ENGINE_HPP
+#define FAG_CORE_ENGINE_HPP
 
 #include "./Renderer.hpp"
+#include "./SceneManager.hpp"
 
 #include <cstddef>
 
@@ -19,9 +20,8 @@ public:
   static void destroy_singleton(void);
 
 public:
-  static Renderer::Backend renderBackend;
+  void assign_renderer(Renderer *);
 
-public:
   int start(void);
   size_t add_scene(Scene &);
 
@@ -49,4 +49,4 @@ private:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_ENGINE_HPP
+#endif // FAG_CORE_ENGINE_HPP

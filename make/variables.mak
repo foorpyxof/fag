@@ -18,6 +18,9 @@ MODULES_DIR := modules
 INCLUDE_DIRS := include $(MODULES_DIR) $(EXTRA_INCLUDE_DIRS)
 LIB_DIRS := $(EXTRA_LIB_DIRS)
 
+# for Vulkan headers; we're using the same headers as the Vulkan library we're using
+INCLUDE_DIRS += $(MODULES_DIR)/fpxlib3d/modules/Vulkan-Headers/include
+
 # comp/link flags
 CFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 CPPFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))

@@ -1,8 +1,8 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_BASIS_HPP
-#define FAG_ENGINE_BASIS_HPP
+#ifndef FAG_CORE_BASIS_HPP
+#define FAG_CORE_BASIS_HPP
 
 #include "./Vectors.hpp"
 
@@ -26,4 +26,4 @@ public:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_BASIS_HPP
+#endif // FAG_CORE_BASIS_HPP

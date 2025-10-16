@@ -1,8 +1,8 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/SceneManager.hpp"
-#include "engine/Scene.hpp"
+#include "core/SceneManager.hpp"
+#include "core/Scene.hpp"
 
 extern "C" {
 #include "debug.h"

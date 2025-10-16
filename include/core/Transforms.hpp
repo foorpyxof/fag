@@ -1,8 +1,8 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_TRANSFORMS_HPP
-#define FAG_ENGINE_TRANSFORMS_HPP
+#ifndef FAG_CORE_TRANSFORMS_HPP
+#define FAG_CORE_TRANSFORMS_HPP
 
 #include "./Basis.hpp"
 #include "./Vectors.hpp"
@@ -29,4 +29,4 @@ public:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_TRANSFORMS_HPP
+#endif // FAG_CORE_TRANSFORMS_HPP

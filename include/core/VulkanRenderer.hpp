@@ -1,49 +1,39 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_VULKANRENDERER_HPP
-#define FAG_ENGINE_VULKANRENDERER_HPP
+#ifndef FAG_CORE_VULKANRENDERER_HPP
+#define FAG_CORE_VULKANRENDERER_HPP
 
-#include <functional>
 extern "C" {
 #include "fpxlib3d/include/vk.h"
+#include "fpxlib3d/include/vk/typedefs.h"
 }
 
 #include "./Renderer.hpp"
 
 #include <cstddef>
-#include <limits>
-#include <unordered_map>
 #include <vector>
 
 namespace fag {
 
 class VulkanRenderer : public Renderer {
+public:
+  class Shader;
+  class Mesh;
 
 public:
   static VulkanRenderer *get_singleton(void);
   static void destroy_singleton(void);
 
 public:
-  enum PipelineIndex : size_t {
-    Default3D = std::numeric_limits<size_t>::max(),
-    Default2D = std::numeric_limits<size_t>::max() - 1,
-  };
-
-  struct Shader : public Renderer::Shader {};
-
-  struct Shape : public Renderer::Shape {
-  public:
-    Fpx3d_Vk_Shape vulkanShape;
-  };
-
-public:
   void render_frame(void);
-  Backend get_backend(void) const;
+  std::weak_ptr<Renderer::Shader> create_shader(std::string &resource_path,
+                                                ShaderStage stage_flag);
+
+  void select_render_context(size_t idx);
 
 public:
-  void select_pipeline(size_t idx);
-  void set_shapes(const std::vector<VulkanRenderer::Shape *> &);
+  void set_shapes(const std::vector<VulkanRenderer::Mesh *> &);
 
 private:
   static VulkanRenderer *m_Singleton;
@@ -75,8 +65,18 @@ private:
 
   std::vector<Fpx3d_Vk_Pipeline *> m_Pipelines;
   Fpx3d_Vk_Pipeline *m_SelectedPipeline = nullptr;
+
+public:
+  class Shader : Renderer::Shader {};
+  class Mesh : Renderer::Mesh {
+  public:
+    Renderer::Mesh *clone(void);
+
+  private:
+    Fpx3d_Vk_ShapeBuffer m_VulkanShapeBuffer;
+  };
 };
 
 } // namespace fag
 
-#endif // FAG_ENGINE_VULKANRENDERER_HPP
+#endif // FAG_CORE_VULKANRENDERER_HPP

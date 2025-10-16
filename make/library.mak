@@ -1,4 +1,4 @@
-LIBRARY_NAMES := engine
+LIBRARY_NAMES := core os error
 
 OBJECTS_FOLDER := $(BUILD_FOLDER)/objects
 LIBRARY_FOLDER := $(BUILD_FOLDER)/lib
@@ -33,12 +33,12 @@ $(MODULES_DIR)/%:
 $(MODULES_DIR)/fpxlib3d/build/lib/%$(LIB_EXT): | $(MODULES_DIR)/fpxlib3d
 	cd $|; $(MAKE) $(subst $(MODULES_DIR)/fpxlib3d/,,$@)
 
-ENGINE_DEPS := vk window general
-ENGINE_DEPS := $(foreach dep,$(ENGINE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx3d_$(dep)$(LIB_EXT))
+CORE_DEPS := vk window general
+CORE_DEPS := $(foreach dep,$(CORE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx3d_$(dep)$(LIB_EXT))
 
 # for the Vulkan renderer
-$(LIBRARY_FOLDER)/$(LIB_PREFIX)engine$(LIB_EXT): $(ENGINE_DEPS)
-$(LIBRARY_FOLDER)/$(LIB_PREFIX)engine$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(ENGINE_DEPS))
+$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(LIB_EXT): $(CORE_DEPS)
+$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
 
 define new-lib-target
 

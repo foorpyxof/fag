@@ -1,10 +1,14 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/Engine.hpp"
-#include "engine/Renderer.hpp"
-#include "engine/SceneManager.hpp"
-#include "engine/VulkanRenderer.hpp"
+#include "core/Engine.hpp"
+#include "core/Renderer.hpp"
+#include "core/SceneManager.hpp"
+#include "core/VulkanRenderer.hpp"
+
+#include "error/Generic.hpp"
+
+#include "dev/allocators.hpp"
 
 extern "C" {
 #include "macros.hpp"
@@ -19,13 +23,10 @@ namespace fag {
 
 /* static initializations */
 Engine *Engine::m_Singleton = nullptr;
-Renderer::Backend Engine::renderBackend =
-    Renderer::Backend::DEFAULT_RENDER_BACKEND;
-
 /* public static methods */
 Engine *Engine::get_singleton(void) {
   if (nullptr == Engine::m_Singleton)
-    Engine::m_Singleton = new Engine;
+    Engine::m_Singleton = FAG_HEAP_CONSTRUCT(Engine);
 
   return Engine::m_Singleton;
 }
@@ -39,10 +40,17 @@ void Engine::destroy_singleton(void) {
 }
 
 /* public instance methods */
+void Engine::assign_renderer(Renderer *r) { m_Renderer = r; }
+
 int Engine::start(void) {
   /*
    * Engine startup code goes here!
    */
+
+  if (nullptr == m_Renderer)
+    throw Error::Generic(
+        // throw std::runtime_error(
+        "No renderer was assigned to the engine before startup");
 
   // FAG_DEBUG("Entering engine loop!");
   // while (!m_ShouldStop) {
@@ -69,12 +77,7 @@ void Engine::stop(void) { _teardown(); }
 /* private methods */
 Engine::Engine()
     : m_ShouldStop(false), m_Renderer(nullptr),
-      m_SceneManager(new SceneManager) {
-  switch (Engine::renderBackend) {
-  case Renderer::Backend::Vulkan:
-    m_Renderer = VulkanRenderer::get_singleton();
-  }
-}
+      m_SceneManager(FAG_HEAP_CONSTRUCT(SceneManager)) {}
 Engine::~Engine(void) {}
 
 void Engine::_teardown(void) {

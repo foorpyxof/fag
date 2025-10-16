@@ -1,8 +1,8 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_SCENEMANAGER_HPP
-#define FAG_ENGINE_SCENEMANAGER_HPP
+#ifndef FAG_CORE_SCENEMANAGER_HPP
+#define FAG_CORE_SCENEMANAGER_HPP
 
 #include "./Scene.hpp"
 
@@ -31,4 +31,4 @@ private:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_SCENEMANAGER_HPP
+#endif // FAG_CORE_SCENEMANAGER_HPP

@@ -49,6 +49,16 @@ extern "C" {
 #undef ARRAY_SIZE
 #endif
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(*arr))
+
+#ifdef MAX
+#undef MAX
+#endif
+#define MAX(_a, _b) ((_a > _b) ? (_a) : (_b))
+
+#ifdef MIN
+#undef MIN
+#endif
+#define MIN(_a, _b) ((_a < _b) ? (_a) : (_b))
 }
 
 #ifdef THROW_ON_FAIL

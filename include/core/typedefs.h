@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef FAG_ENGINE_TYPEDEFS_HPP
-#define FAG_ENGINE_TYPEDEFS_HPP
+#ifndef FAG_CORE_TYPEDEFS_HPP
+#define FAG_CORE_TYPEDEFS_HPP
 
 #include <cstddef>
 
@@ -20,4 +20,4 @@ typedef struct {
 
 } // namespace fag
 
-#endif // FAG_ENGINE_TYPEDEFS_HPP
+#endif // FAG_CORE_TYPEDEFS_HPP

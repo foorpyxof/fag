@@ -1,10 +1,12 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_ENGINE_ENTITY_HPP
-#define FAG_ENGINE_ENTITY_HPP
+#ifndef FAG_CORE_ENTITY_HPP
+#define FAG_CORE_ENTITY_HPP
 
-#include "engine/typedefs.h"
+#include "core/typedefs.h"
+
+#include "dev/allocators.hpp"
 
 #include <string>
 
@@ -45,7 +47,7 @@ public:
       if (nullptr == retval)
         a->freeFunc(new_object);
     } else {
-      Old *new_object = new New;
+      Old *new_object = FAG_HEAP_CONSTRUCT(New);
       *new_object = *from;
 
       retval = dynamic_cast<New *>(new_object);
@@ -59,4 +61,4 @@ public:
 
 } // namespace fag
 
-#endif // FAG_ENGINE_ENTITY_HPP
+#endif // FAG_CORE_ENTITY_HPP

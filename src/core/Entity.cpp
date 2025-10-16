@@ -1,7 +1,7 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "engine/Entity.hpp"
+#include "core/Entity.hpp"
 
 namespace fag {
 
