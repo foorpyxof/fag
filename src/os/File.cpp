@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "os/File.hpp"
 #include "error/Generic.hpp"
 

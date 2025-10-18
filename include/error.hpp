@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #ifndef FAG_ERROR_HPP
 #define FAG_ERROR_HPP
 
