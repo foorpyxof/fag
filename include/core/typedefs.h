@@ -6,18 +6,6 @@
 #ifndef FAG_CORE_TYPEDEFS_HPP
 #define FAG_CORE_TYPEDEFS_HPP
 
-#include <cstddef>
-
-namespace fag {
-
-typedef void *(*AllocationFunction)(size_t);
-typedef void (*FreeFunction)(void *);
-
-typedef struct {
-  AllocationFunction allocFunc;
-  FreeFunction freeFunc;
-} Allocator;
-
-} // namespace fag
+namespace fag {} // namespace fag
 
 #endif // FAG_CORE_TYPEDEFS_HPP

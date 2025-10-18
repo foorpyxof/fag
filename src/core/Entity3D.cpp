@@ -7,9 +7,7 @@
 
 namespace fag {
 
-Entity3D::Entity3D() : m_Transform(), m_TransformHasChanged(true) {
-  _set_basetype(Entity::Basetype::Entity3D);
-}
+Entity3D::Entity3D() : m_Transform(), m_TransformHasChanged(true) {}
 Entity3D::~Entity3D() {}
 
 void Entity3D::update() {}

@@ -58,7 +58,7 @@ VulkanRenderer *VulkanRenderer::m_Singleton = nullptr;
 /* public static methods */
 VulkanRenderer *VulkanRenderer::get_singleton(void) {
   if (nullptr == VulkanRenderer::m_Singleton)
-    VulkanRenderer::m_Singleton = FAG_HEAP_CONSTRUCT(VulkanRenderer);
+    FAG_HEAP_CONSTRUCT(VulkanRenderer, VulkanRenderer::m_Singleton, ());
 
   return VulkanRenderer::m_Singleton;
 }
@@ -288,7 +288,8 @@ void VulkanRenderer::_create_base_pipelines(void) {
 }
 
 Renderer::Mesh *VulkanRenderer::Mesh::clone(void) {
-  VulkanRenderer::Mesh *cloned_mesh = FAG_HEAP_CONSTRUCT(VulkanRenderer::Mesh);
+  VulkanRenderer::Mesh *cloned_mesh;
+  FAG_HEAP_CONSTRUCT(VulkanRenderer::Mesh, cloned_mesh, ());
 
   cloned_mesh->m_VulkanShapeBuffer = m_VulkanShapeBuffer;
 

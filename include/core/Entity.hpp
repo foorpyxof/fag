@@ -4,18 +4,18 @@
 #ifndef FAG_CORE_ENTITY_HPP
 #define FAG_CORE_ENTITY_HPP
 
-#include "core/typedefs.h"
+#include "./typedefs.h"
 
-#include "dev/allocators.hpp"
+#include "../dev/allocators.hpp"
 
+#include <iostream>
+#include <memory>
 #include <string>
+#include <type_traits>
 
 namespace fag {
 
 class Entity {
-public:
-  enum class Basetype { Entity2D, Entity3D };
-
 public:
   Entity(void);
   virtual ~Entity(void) = 0;
@@ -26,36 +26,42 @@ public:
   const std::string &get_name() const;
   void set_name(const char *);
 
-  Basetype get_basetype() const;
-
-protected:
-  void _set_basetype(Basetype);
-
 private:
   std::string m_Name;
-  Basetype m_Basetype;
 
 public:
-  template <class Old, class New> static New *promote(Old *from, Allocator *a) {
-    New *retval = nullptr;
+  template <class From, class To>
+  static std::shared_ptr<From> promote(From *from) {
+    static_assert(std::is_base_of<Entity, From>(),
+                  "\"From\" class in entity promotion is not derived from the "
+                  "base \"Entity\" class");
+    static_assert(std::is_base_of<From, To>(),
+                  "\"To\" class in entity promotion is not derived from the "
+                  "\"From\" class");
 
-    if (a && a->allocFunc && a->freeFunc) {
-      Old *new_object = static_cast<Old *>(a->allocFunc(sizeof(New)));
-      *new_object = *from;
+    To *retval = nullptr;
 
-      retval = dynamic_cast<New *>(new_object);
-      if (nullptr == retval)
-        a->freeFunc(new_object);
-    } else {
-      Old *new_object = FAG_HEAP_CONSTRUCT(New);
-      *new_object = *from;
+    // if (a && a->allocFunc && a->freeFunc) {
+    //   Old *new_object = static_cast<Old *>(a->allocFunc(sizeof(New)));
+    //   *new_object = *from;
+    //
+    //   retval = dynamic_cast<New *>(new_object);
+    //   if (nullptr == retval)
+    //     a->freeFunc(new_object);
+    // } else {
 
-      retval = dynamic_cast<New *>(new_object);
-      if (nullptr == retval)
-        delete new_object;
+    From *FAG_HEAP_CONSTRUCT(To, new_object, ());
+    *new_object = *from;
+
+    retval = dynamic_cast<To *>(new_object);
+    if (nullptr == retval) {
+      // this should never happen
+      FAG_HEAP_DESTRUCT(From, new_object);
     }
 
-    return retval;
+    // }
+
+    return std::shared_ptr<From>(retval);
   }
 };
 

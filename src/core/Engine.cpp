@@ -1,7 +1,6 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "core/Engine.hpp"
 #include "core/Renderer.hpp"
 #include "core/SceneManager.hpp"
 #include "core/VulkanRenderer.hpp"
@@ -9,6 +8,10 @@
 #include "error/Generic.hpp"
 
 #include "dev/allocators.hpp"
+
+#include <sstream>
+
+#include "core/Engine.hpp"
 
 extern "C" {
 #include "macros.hpp"
@@ -23,10 +26,12 @@ namespace fag {
 
 /* static initializations */
 Engine *Engine::m_Singleton = nullptr;
+Allocator Engine::m_CustomAllocator = {};
+
 /* public static methods */
 Engine *Engine::get_singleton(void) {
   if (nullptr == Engine::m_Singleton)
-    Engine::m_Singleton = FAG_HEAP_CONSTRUCT(Engine);
+    FAG_HEAP_CONSTRUCT(Engine, Engine::m_Singleton, ());
 
   return Engine::m_Singleton;
 }
@@ -37,6 +42,21 @@ void Engine::destroy_singleton(void) {
 
   delete Engine::m_Singleton;
   Engine::m_Singleton = nullptr;
+}
+
+const Allocator &Engine::get_custom_allocator(void) {
+  return m_CustomAllocator;
+}
+
+void Engine::set_custom_allocator(Allocator &allocator) {
+  if (m_Singleton && m_Singleton->m_Running)
+    throw Error::Generic(
+        "cannot assign a custom allocator while the engine is running");
+
+  if (!allocator.alloc_func || !allocator.free_func)
+    return;
+
+  m_CustomAllocator = allocator;
 }
 
 /* public instance methods */
@@ -51,6 +71,8 @@ int Engine::start(void) {
     throw Error::Generic(
         // throw std::runtime_error(
         "No renderer was assigned to the engine before startup");
+
+  m_Running = true;
 
   // FAG_DEBUG("Entering engine loop!");
   // while (!m_ShouldStop) {
@@ -75,14 +97,23 @@ void Engine::stop(void) { _teardown(); }
 /* private static methods */
 
 /* private methods */
-Engine::Engine()
-    : m_ShouldStop(false), m_Renderer(nullptr),
-      m_SceneManager(FAG_HEAP_CONSTRUCT(SceneManager)) {}
+Engine::Engine() : m_Running(false), m_ShouldStop(false), m_Renderer(nullptr) {
+
+  FAG_HEAP_CONSTRUCT(SceneManager, m_SceneManager, ());
+
+  char line_info[32]{0};
+  FAG_LINE_INFO(line_info);
+  std::ostringstream message;
+  message << "Friendly reminder to all of the F.A.G. developers that any "
+             "std::shared_ptr<> should be constructed with the deleter of "
+             "programmer's choice (if it exists) "
+             "(at "
+          << line_info << ")";
+  FAG_WARN("%s", message.str().c_str());
+}
 Engine::~Engine(void) {}
 
-void Engine::_teardown(void) {
-  FAG_DEBUG("Destroying F.A.G. engine");
-  FAG_TODO("Implement 'Engine::_teardown(void)'");
-}
+IMPLEMENT_THIS(void Engine::_teardown(void), m_Running = false;
+               FAG_DEBUG("Destroying F.A.G. engine");)
 
 } // namespace fag

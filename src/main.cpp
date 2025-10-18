@@ -1,15 +1,19 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "core/Entity.hpp"
+#include "core/Entity3D.hpp"
 #include "core/Renderer.hpp"
 #include "core/VulkanRenderer.hpp"
 #include "fag.hpp"
+#include <type_traits>
 
 extern "C" {
 #include "macros.hpp"
 }
 
 #include <cstdio>
+#include <cstdlib>
 #include <iostream>
 
 fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
@@ -26,7 +30,7 @@ fag::Scene::LoadResult my_scene_unloader(fag::Scene &to_load) {
 
 class MyEntity3D : public fag::Entity3D {
 public:
-  MyEntity3D() { printf("fagballs\n"); }
+  MyEntity3D() { printf("hello !\n"); }
   ~MyEntity3D() { printf("goodbye !\n"); }
 };
 
@@ -38,6 +42,15 @@ int main(void) {
   std::cout << "Renderer is VulkanRenderer? ";
   std::cout << (renderer->is<fag::VulkanRenderer>() ? "yes" : "no")
             << std::endl;
+
+  fag::Entity3D *ent_3d = new fag::Entity3D;
+
+  std::shared_ptr<fag::Entity3D> my_ent_3d =
+      fag::Entity::promote<fag::Entity3D, MyEntity3D>(ent_3d);
+
+  delete ent_3d;
+
+  std::cout << my_ent_3d.get() << std::endl;
 
   fag::Scene my_scene;
   my_scene.set_loader(my_scene_loader);

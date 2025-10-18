@@ -4,6 +4,7 @@
 #ifndef FAG_CORE_ENGINE_HPP
 #define FAG_CORE_ENGINE_HPP
 
+#include "./Allocator.hpp"
 #include "./Renderer.hpp"
 #include "./SceneManager.hpp"
 
@@ -19,6 +20,9 @@ public:
   static Engine *get_singleton(void);
   static void destroy_singleton(void);
 
+  static const Allocator &get_custom_allocator(void);
+  static void set_custom_allocator(Allocator &);
+
 public:
   void assign_renderer(Renderer *);
 
@@ -33,6 +37,7 @@ public:
 
 private:
   static Engine *m_Singleton;
+  static Allocator m_CustomAllocator;
 
 private:
   Engine(void);
@@ -41,9 +46,11 @@ private:
   void _teardown(void);
 
 private:
+  bool m_Running;
   bool m_ShouldStop;
 
   Renderer *m_Renderer;
+
   SceneManager *m_SceneManager;
 };
 
