@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "os/File.hpp"
-#include "error/Generic.hpp"
 
 #include "debug.h"
-#include "error/IError.hpp"
+#include "error.hpp"
 #include "macros.hpp"
 
 #include <cstring>
@@ -126,8 +125,7 @@ void FileBuffer::write(void *input, int64_t byte_count) {
     // failed to insert
     std::ostringstream m;
     m << "Could not split file chunks for writing for some reason";
-    FAG_TODO("Create an Internal error class, and use that here");
-    throw Error::Generic(m.str().c_str(), nullptr, 0);
+    throw Error::Internal(m.str().c_str(), nullptr, 0);
   }
 
   // step 3:
@@ -141,8 +139,7 @@ void FileBuffer::write(void *input, int64_t byte_count) {
 
     std::ostringstream m;
     m << "Could not insert new file chunk with new content for some reason";
-    FAG_TODO("Create an Internal error class, and use that here");
-    throw Error::Generic(m.str().c_str(), nullptr, 0);
+    throw Error::Internal(m.str().c_str(), nullptr, 0);
   }
 
   chunk_to_split->data.assign(chunk_to_split->data.begin(),
@@ -171,11 +168,7 @@ FileBuffer::_get_current_chunk(int64_t *traversed_count_output) {
 
     std::ostringstream m;
     m << "Internal FileBuffer index is out of range for some reason";
-
-    // TODO: change to Internal error, because erroring here means that earlier
-    // internal logic executed incorrectly
-    FAG_TODO("Create an Internal error class, and use that here");
-    throw Error::Generic(m.str().c_str(), nullptr, 0);
+    throw Error::Internal(m.str().c_str(), nullptr, 0);
   }
 
   *traversed_count_output = traversed;

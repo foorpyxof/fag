@@ -1,9 +1,9 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "error/Generic.hpp"
-
 #include <sstream>
+
+#include "error/Generic.hpp"
 
 namespace fag {
 
@@ -21,14 +21,8 @@ Generic::Generic(const char *msg, const char *file, int line) {
   else
     full_msg << ERROR_MESSAGE;
 
-  if (nullptr != file) {
-    full_msg << "\n(at: " << file;
-
-    if (line > 0)
-      full_msg << ":" << std::to_string(line);
-
-    full_msg << ")";
-  }
+  if (nullptr != file && line > 0)
+    full_msg << "\n(at: " << file << ":" << std::to_string(line) << ")";
 
   m_Message = full_msg.str();
 }
