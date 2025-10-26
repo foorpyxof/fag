@@ -4,12 +4,12 @@
 #ifndef FAG_CORE_VULKANRENDERER_HPP
 #define FAG_CORE_VULKANRENDERER_HPP
 
+#include "./Renderer.hpp"
+
 extern "C" {
 #include "fpxlib3d/include/vk.h"
 #include "fpxlib3d/include/vk/typedefs.h"
 }
-
-#include "./Renderer.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -29,23 +29,19 @@ public:
   void render_frame(void);
   std::weak_ptr<Renderer::Shader> create_shader(std::string &resource_path,
                                                 ShaderStage stage_flag);
-
   void select_render_context(size_t idx);
+  void set_shapes(const std::vector<Renderer::Mesh *> &);
 
 public:
-  void set_shapes(const std::vector<VulkanRenderer::Mesh *> &);
+  ~VulkanRenderer(void);
+
+protected:
+  VulkanRenderer(void);
 
 private:
   static VulkanRenderer *m_Singleton;
 
-  struct PipelineLayoutCreator {
-    std::vector<Fpx3d_Vk_DescriptorSetLayout> descriptorSetLayouts;
-  };
-
 private:
-  VulkanRenderer(void);
-  ~VulkanRenderer(void);
-
   void _vulkan_setup(void);
   void _glfw_setup(void);
   void _gpu_setup(void);

@@ -92,7 +92,7 @@ void VulkanRenderer::select_render_context(size_t idx) {
   m_SelectedPipeline = m_Pipelines[real_index];
 }
 IMPLEMENT_THIS(void VulkanRenderer::set_shapes(
-                   const std::vector<VulkanRenderer::Mesh *> &shapes),
+                   const std::vector<Renderer::Mesh *> &shapes),
                UNUSED(shapes););
 
 VulkanRenderer::VulkanRenderer(void)

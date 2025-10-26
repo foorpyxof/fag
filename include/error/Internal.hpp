@@ -10,10 +10,10 @@ namespace Error {
 
 class Internal : public IError {
 public:
-  Internal(const char *message, const char *filename, int line_number);
+  const char *what() const noexcept;
 
 public:
-  const char *what() const noexcept;
+  Internal(const char *message, const char *filename, int line_number);
 
 private:
   std::string m_Message;

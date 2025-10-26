@@ -1,12 +1,7 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "core/Entity.hpp"
-#include "core/Entity3D.hpp"
-#include "core/Renderer.hpp"
-#include "core/VulkanRenderer.hpp"
 #include "fag.hpp"
-#include <type_traits>
 
 extern "C" {
 #include "macros.hpp"

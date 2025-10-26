@@ -11,12 +11,12 @@ namespace fag {
 typedef void *(*AllocationFunction)(size_t);
 typedef void (*FreeFunction)(void *);
 
-typedef struct fag_allocator_struct {
+struct Allocator {
   AllocationFunction alloc_func;
   FreeFunction free_func;
 
   bool is_valid() const;
-} Allocator;
+};
 
 } // namespace fag
 

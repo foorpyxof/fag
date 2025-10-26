@@ -8,10 +8,10 @@ namespace Error {
 
 class Fatal {
 public:
-  Fatal(const char *message, const char *file, int line);
+  const char *what() const noexcept;
 
 public:
-  const char *what() const noexcept;
+  Fatal(const char *message, const char *file, int line);
 
 private:
   std::string m_Message;

@@ -7,7 +7,6 @@
 #include <exception>
 
 namespace fag {
-
 namespace Error {
 
 class IError : std::exception {
@@ -16,7 +15,6 @@ public:
 };
 
 }; // namespace Error
-
 }; // namespace fag
 
 #endif // FAG_EXCEPTION_IEXCEPTION_HPP

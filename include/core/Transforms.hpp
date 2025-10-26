@@ -10,19 +10,11 @@
 namespace fag {
 
 struct Transform2D {
-public:
-  Transform2D() = default;
-
-public:
   Vector2 origin;
   Basis2D basis;
 };
 
 struct Transform3D {
-public:
-  Transform3D() = default;
-
-public:
   Vector3 origin;
   Basis3D basis;
 };

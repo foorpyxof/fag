@@ -12,7 +12,7 @@ class SceneManager;
 
 class Scene {
 public:
-  enum class LoadResult : int { Success = 0, Failure = -1 };
+  enum class LoadResult : int;
   typedef LoadResult (*LoadCallback)(Scene &);
 
 public:
@@ -22,6 +22,8 @@ public:
   // use these methods in your Loading callback
   bool load_from_gltf(const char *path);
 
+  bool is_valid(void) const;
+
 private:
   LoadCallback _load = nullptr;
   LoadCallback _unload = nullptr;
@@ -30,6 +32,9 @@ private:
   friend SceneManager;
 
   bool m_IsLoaded;
+
+public:
+  enum class LoadResult : int { Success = 0, Failure = -1 };
 };
 
 } // namespace fag

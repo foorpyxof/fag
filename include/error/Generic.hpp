@@ -13,12 +13,12 @@ namespace Error {
 
 class Generic : public IError {
 public:
+  const char *what() const noexcept;
+
+public:
   Generic();
   Generic(const char *message);
   Generic(const char *message, const char *filename, int line_number);
-
-public:
-  const char *what() const noexcept;
 
 private:
   std::string m_Message;

@@ -6,10 +6,11 @@
 #include "error/Generic.hpp"
 
 namespace fag {
-
 namespace Error {
 
 #define ERROR_MESSAGE "An error has occured at runtime."
+
+const char *Generic::what() const noexcept { return m_Message.c_str(); }
 
 Generic::Generic() : Generic(nullptr) {}
 Generic::Generic(const char *msg) : Generic(msg, nullptr, 0) {}
@@ -27,8 +28,5 @@ Generic::Generic(const char *msg, const char *file, int line) {
   m_Message = full_msg.str();
 }
 
-const char *Generic::what() const noexcept { return m_Message.c_str(); }
-
 }; // namespace Error
-
 }; // namespace fag

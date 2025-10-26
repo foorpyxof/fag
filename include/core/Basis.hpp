@@ -9,19 +9,15 @@
 namespace fag {
 
 struct Basis2D {
-public:
-  Basis2D() : x(1, 0), y(0, 1) {}
-
-public:
   Vector2 x, y;
+
+  Basis2D() : x(1, 0), y(0, 1) {}
 };
 
 struct Basis3D {
-public:
-  Basis3D() : x(1, 0, 0), y(0, 1, 0), z(0, 0, 1) {}
-
-public:
   Vector3 x, y, z;
+
+  Basis3D() : x(1, 0, 0), y(0, 1, 0), z(0, 0, 1) {}
 };
 
 } // namespace fag

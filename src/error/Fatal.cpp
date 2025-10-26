@@ -5,10 +5,14 @@
 namespace fag {
 namespace Error {
 
+#define ERROR_MESSAGE "A fatal error has occured."
+
+const char *Fatal::what(void) const noexcept { return m_Message.c_str(); }
+
 Fatal::Fatal(const char *msg, const char *file, int line) {
   std::ostringstream full_msg;
 
-  full_msg << "A fatal error has occured.";
+  full_msg << ERROR_MESSAGE;
 
   if (!msg || !file || line < 1) {
     std::ostringstream err_msg;

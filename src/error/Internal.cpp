@@ -7,9 +7,13 @@
 namespace fag {
 namespace Error {
 
+#define ERROR_MESSAGE "An internal error has occured in the F.A.G. engine."
+
+const char *Internal::what(void) const noexcept { return m_Message.c_str(); }
+
 Internal::Internal(const char *msg, const char *file, int line) {
   std::ostringstream full_msg;
-  full_msg << "An internal error has occured in the F.A.G. engine.";
+  full_msg << ERROR_MESSAGE;
 
   if (!msg || !file || line < 1) {
     std::ostringstream err_msg;

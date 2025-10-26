@@ -24,11 +24,9 @@ extern "C" {
 
 namespace fag {
 
-/* static initializations */
 Engine *Engine::m_Singleton = nullptr;
 Allocator Engine::m_CustomAllocator = {};
 
-/* public static methods */
 Engine *Engine::get_singleton(void) {
   if (nullptr == Engine::m_Singleton)
     FAG_HEAP_CONSTRUCT(Engine, Engine::m_Singleton, ());
@@ -59,7 +57,6 @@ void Engine::set_custom_allocator(Allocator &allocator) {
   m_CustomAllocator = allocator;
 }
 
-/* public instance methods */
 void Engine::assign_renderer(Renderer *r) { m_Renderer = r; }
 
 int Engine::start(void) {
@@ -91,12 +88,11 @@ size_t Engine::add_scene(Scene &to_append) {
 }
 
 void Engine::raise_stop_condition(void) { m_ShouldStop = true; }
-
 void Engine::stop(void) { _teardown(); }
 
-/* private static methods */
+IMPLEMENT_THIS(void Engine::_teardown(void), m_Running = false;
+               FAG_DEBUG("Destroying F.A.G. engine");)
 
-/* private methods */
 Engine::Engine() : m_Running(false), m_ShouldStop(false), m_Renderer(nullptr) {
 
   FAG_HEAP_CONSTRUCT(SceneManager, m_SceneManager, ());
@@ -112,8 +108,5 @@ Engine::Engine() : m_Running(false), m_ShouldStop(false), m_Renderer(nullptr) {
   FAG_WARN("%s", message.str().c_str());
 }
 Engine::~Engine(void) {}
-
-IMPLEMENT_THIS(void Engine::_teardown(void), m_Running = false;
-               FAG_DEBUG("Destroying F.A.G. engine");)
 
 } // namespace fag

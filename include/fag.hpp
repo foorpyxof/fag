@@ -9,7 +9,4 @@
 #include "./general.hpp"
 #include "./os.hpp"
 
-#undef THROW_ON_FAIL
-#undef DEEZ_NUTSsAKDHSUKAHDLSAJ
-
 #endif // FAG_HPP

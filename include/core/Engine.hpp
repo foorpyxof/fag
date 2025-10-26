@@ -26,8 +26,9 @@ public:
 public:
   void assign_renderer(Renderer *);
 
-  int start(void);
   size_t add_scene(Scene &);
+
+  int start(void);
 
   // tell the engine to finish up and then de-init
   void raise_stop_condition(void);
@@ -35,14 +36,17 @@ public:
   // forcefully de-init the engine
   void stop(void);
 
+public:
+  ~Engine(void);
+
 private:
   static Engine *m_Singleton;
   static Allocator m_CustomAllocator;
 
-private:
+protected:
   Engine(void);
-  ~Engine(void);
 
+private:
   void _teardown(void);
 
 private:

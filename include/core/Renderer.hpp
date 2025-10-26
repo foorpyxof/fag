@@ -7,20 +7,17 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace fag {
 
 class Renderer {
 public:
-  enum RenderContextIndex : size_t;
   class Shader;
-  enum class ShaderStage;
   class Mesh;
 
-public:
-  template <class T> constexpr bool is() const {
-    return (nullptr != dynamic_cast<const T *>(this));
-  }
+  enum RenderContextIndex : size_t;
+  enum class ShaderStage;
 
 public:
   virtual void render_frame(void) = 0;
@@ -38,16 +35,27 @@ public:
   // virtual void /* return datatype ? */
   // create_render_context(void /* creation data datatype? */) = 0;
 
-  Renderer() {};
-  virtual ~Renderer(void) {};
+  virtual void set_shapes(const std::vector<Renderer::Mesh *> &) = 0;
+
+public:
+  template <class T> constexpr bool is() const {
+    return (nullptr != dynamic_cast<const T *>(this));
+  }
+
+public:
+  virtual ~Renderer(void);
 
 protected:
   size_t _convert_render_context_index(size_t idx);
 
 protected:
+  Renderer(void);
+
+protected:
   static const size_t BASE_RENDER_CONTEXT_COUNT = 2;
 
 public:
+  // nested type declarations
   enum RenderContextIndex : size_t {
     Default3D = std::numeric_limits<size_t>::max(),
     Default2D = std::numeric_limits<size_t>::max() - 1,
@@ -64,8 +72,7 @@ public:
   class Mesh {
   public:
     virtual Mesh *clone(void) = 0;
-
-    virtual ~Mesh() {};
+    virtual ~Mesh(void);
   };
 };
 

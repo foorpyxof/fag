@@ -4,8 +4,8 @@
 #ifndef FAG_CORE_ENTITY3D_HPP
 #define FAG_CORE_ENTITY3D_HPP
 
-#include "./Entity.hpp"
 #include "./Drawable.hpp"
+#include "./Entity.hpp"
 #include "./Transforms.hpp"
 #include "./Vectors.hpp"
 
@@ -13,14 +13,16 @@ namespace fag {
 
 class Entity3D : public Entity, Drawable {
 public:
-  Entity3D();
-  virtual ~Entity3D();
+  virtual void update(void);
+  virtual void fixed_update(void);
 
-  virtual void update();
-  virtual void fixed_update();
-
-  Transform3D get_transform() const;
+public:
+  const Transform3D &get_transform(void) const;
   void set_transform(Transform3D &);
+
+public:
+  Entity3D(void);
+  virtual ~Entity3D(void);
 
 private:
   friend class Renderer;
