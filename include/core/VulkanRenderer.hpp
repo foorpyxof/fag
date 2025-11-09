@@ -15,31 +15,28 @@ extern "C" {
 #include <vector>
 
 namespace fag {
+namespace Vulkan {
 
-class VulkanRenderer : public Renderer {
+class Renderer : public fag::Renderer {
 public:
-  class Shader;
-  class Mesh;
-
-public:
-  static VulkanRenderer *get_singleton(void);
+  static Renderer *get_singleton(void);
   static void destroy_singleton(void);
 
 public:
   void render_frame(void);
-  std::weak_ptr<Renderer::Shader> create_shader(std::string &resource_path,
-                                                ShaderStage stage_flag);
+  std::weak_ptr<Shader> create_shader(std::string &resource_path,
+                                      ShaderStage stage_flag);
   void select_render_context(size_t idx);
-  void set_shapes(const std::vector<Renderer::Mesh *> &);
+  void set_shapes(const std::vector<Mesh *> &);
 
 public:
-  ~VulkanRenderer(void);
+  ~Renderer(void);
 
 protected:
-  VulkanRenderer(void);
+  Renderer(void);
 
 private:
-  static VulkanRenderer *m_Singleton;
+  static Renderer *m_Singleton;
 
 private:
   void _vulkan_setup(void);
@@ -63,16 +60,9 @@ private:
   Fpx3d_Vk_Pipeline *m_SelectedPipeline = nullptr;
 
 public:
-  class Shader : Renderer::Shader {};
-  class Mesh : Renderer::Mesh {
-  public:
-    Renderer::Mesh *clone(void);
-
-  private:
-    Fpx3d_Vk_ShapeBuffer m_VulkanShapeBuffer;
-  };
 };
 
+} // namespace Vulkan
 } // namespace fag
 
 #endif // FAG_CORE_VULKANRENDERER_HPP

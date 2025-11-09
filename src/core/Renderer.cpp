@@ -22,6 +22,4 @@ size_t Renderer::_convert_render_context_index(size_t idx) {
 Renderer::Renderer(void) {}
 Renderer::~Renderer(void) {}
 
-Renderer::Mesh::~Mesh(void) {}
-
 } // namespace fag

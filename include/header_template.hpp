@@ -1,5 +1,6 @@
 #undef FAG_HEADERTEMPLATE_HPP
 #ifdef FAG_HEADERTEMPLATE_HPP
+// ^^^ this guard prevents inclusion ^^^
 
 namespace fag {
 namespace another_namespace_maybe {

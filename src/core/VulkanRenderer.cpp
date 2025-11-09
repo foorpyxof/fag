@@ -51,24 +51,26 @@ struct default2d_pipeline_descriptor_bindings {
 };
 
 namespace fag {
+namespace Vulkan {
 
 /* static initializations */
-VulkanRenderer *VulkanRenderer::m_Singleton = nullptr;
+Renderer *Renderer::m_Singleton = nullptr;
 
 /* public static methods */
-VulkanRenderer *VulkanRenderer::get_singleton(void) {
-  if (nullptr == VulkanRenderer::m_Singleton)
-    FAG_HEAP_CONSTRUCT(VulkanRenderer, VulkanRenderer::m_Singleton, ());
+Renderer *Renderer::get_singleton(void) {
+  if (nullptr == Renderer::m_Singleton) {
+    FAG_HEAP_CONSTRUCT(Renderer, Renderer::m_Singleton, ());
+  }
 
-  return VulkanRenderer::m_Singleton;
+  return Renderer::m_Singleton;
 }
 
-void VulkanRenderer::destroy_singleton(void) {
-  if (nullptr == VulkanRenderer::m_Singleton)
+void Renderer::destroy_singleton(void) {
+  if (nullptr == Renderer::m_Singleton)
     return;
 
-  delete VulkanRenderer::m_Singleton;
-  VulkanRenderer::m_Singleton = nullptr;
+  delete Renderer::m_Singleton;
+  Renderer::m_Singleton = nullptr;
 }
 
 #define INIT_WINDOW_WIDTH 500
@@ -76,14 +78,14 @@ void VulkanRenderer::destroy_singleton(void) {
 
 /* public methods implementations */
 
-IMPLEMENT_THIS(void VulkanRenderer::render_frame(void), );
+IMPLEMENT_THIS(void Renderer::render_frame(void), );
 
-IMPLEMENT_THIS(std::weak_ptr<Renderer::Shader> VulkanRenderer::create_shader(
+IMPLEMENT_THIS(std::weak_ptr<Shader> Renderer::create_shader(
                    std::string &resource_path, ShaderStage stage_flags),
                UNUSED(resource_path);
                UNUSED(stage_flags); return {};);
 
-void VulkanRenderer::select_render_context(size_t idx) {
+void Renderer::select_render_context(size_t idx) {
   size_t real_index = _convert_render_context_index(idx);
 
   if (real_index >= m_Pipelines.size())
@@ -91,12 +93,10 @@ void VulkanRenderer::select_render_context(size_t idx) {
 
   m_SelectedPipeline = m_Pipelines[real_index];
 }
-IMPLEMENT_THIS(void VulkanRenderer::set_shapes(
-                   const std::vector<Renderer::Mesh *> &shapes),
+IMPLEMENT_THIS(void Renderer::set_shapes(const std::vector<Mesh *> &shapes),
                UNUSED(shapes););
 
-VulkanRenderer::VulkanRenderer(void)
-    : m_Pipelines(Renderer::BASE_RENDER_CONTEXT_COUNT) {
+Renderer::Renderer(void) : m_Pipelines(Renderer::BASE_RENDER_CONTEXT_COUNT) {
   UNUSED(m_VulkanContext);
 
   if (!s_VulkanSettingsInitialized) {
@@ -154,9 +154,9 @@ VulkanRenderer::VulkanRenderer(void)
   _gpu_setup();
   _create_base_pipelines();
 }
-VulkanRenderer::~VulkanRenderer(void) {}
+Renderer::~Renderer(void) {}
 
-void VulkanRenderer::_vulkan_setup(void) {
+void Renderer::_vulkan_setup(void) {
   {
     VkApplicationInfo app_info{};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -187,7 +187,7 @@ void VulkanRenderer::_vulkan_setup(void) {
   fpx3d_vk_create_instance(&m_VulkanContext);
 }
 
-void VulkanRenderer::_glfw_setup(void) {
+void Renderer::_glfw_setup(void) {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
@@ -210,7 +210,7 @@ void VulkanRenderer::_glfw_setup(void) {
   fpx3d_wnd_set_window_pointer(&m_WindowContext, win);
 }
 
-void VulkanRenderer::_gpu_setup(void) {
+void Renderer::_gpu_setup(void) {
   fpx3d_vk_select_gpu(&m_VulkanContext, s_gpu_scoring_function);
 
   fpx3d_vk_allocate_logicalgpus(&m_VulkanContext, 1);
@@ -222,7 +222,7 @@ void VulkanRenderer::_gpu_setup(void) {
     throw std::runtime_error("Failed to initialize Vulkan GPU");
 }
 
-void VulkanRenderer::_create_default3d_pipeline_layout(void) {
+void Renderer::_create_default3d_pipeline_layout(void) {
   Fpx3d_Vk_LogicalGpu *lgpu = fpx3d_vk_get_logicalgpu_at(&m_VulkanContext, 0);
 
   Fpx3d_Vk_DescriptorSetLayout default3d_descriptor_set_layouts[2]{};
@@ -239,7 +239,7 @@ void VulkanRenderer::_create_default3d_pipeline_layout(void) {
       ARRAY_SIZE(default3d_descriptor_set_layouts), lgpu);
 }
 
-void VulkanRenderer::_create_default2d_pipeline_layout(void) {
+void Renderer::_create_default2d_pipeline_layout(void) {
   Fpx3d_Vk_LogicalGpu *lgpu = fpx3d_vk_get_logicalgpu_at(&m_VulkanContext, 0);
 
   Fpx3d_Vk_DescriptorSetLayout default2d_descriptor_set_layouts[2]{};
@@ -257,14 +257,14 @@ void VulkanRenderer::_create_default2d_pipeline_layout(void) {
       ARRAY_SIZE(default2d_descriptor_set_layouts), lgpu);
 }
 
-void VulkanRenderer::_create_pipeline_layouts(void) {
+void Renderer::_create_pipeline_layouts(void) {
   _create_default3d_pipeline_layout();
 
   // TODO: implement
   // _create_default2d_pipeline_layout();
 }
 
-void VulkanRenderer::_create_base_pipelines(void) {
+void Renderer::_create_base_pipelines(void) {
   Fpx3d_Vk_LogicalGpu *lgpu = fpx3d_vk_get_logicalgpu_at(&m_VulkanContext, 0);
 
   fpx3d_vk_allocate_commandpools(lgpu, 2);
@@ -287,15 +287,7 @@ void VulkanRenderer::_create_base_pipelines(void) {
   fpx3d_vk_create_framebuffers(sc, &m_VulkanContext, lgpu, renderpass);
 }
 
-Renderer::Mesh *VulkanRenderer::Mesh::clone(void) {
-  VulkanRenderer::Mesh *cloned_mesh;
-  FAG_HEAP_CONSTRUCT(VulkanRenderer::Mesh, cloned_mesh, ());
-
-  cloned_mesh->m_VulkanShapeBuffer = m_VulkanShapeBuffer;
-
-  return cloned_mesh;
-}
-
+} // namespace Vulkan
 } // namespace fag
 
 // STATIC FUNCTIONS DEFINED BELOW

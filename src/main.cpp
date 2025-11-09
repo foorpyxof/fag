@@ -31,11 +31,11 @@ public:
 
 int main(void) {
   fag::Engine *engine = fag::Engine::get_singleton();
-  fag::Renderer *renderer = fag::VulkanRenderer::get_singleton();
+  fag::Renderer *renderer = fag::Vulkan::Renderer::get_singleton();
   engine->assign_renderer(renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
-  std::cout << (renderer->is<fag::VulkanRenderer>() ? "yes" : "no")
+  std::cout << (renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
             << std::endl;
 
   fag::Entity3D *ent_3d = new fag::Entity3D;

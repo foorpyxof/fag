@@ -28,8 +28,9 @@ Engine *Engine::m_Singleton = nullptr;
 Allocator Engine::m_CustomAllocator = {};
 
 Engine *Engine::get_singleton(void) {
-  if (nullptr == Engine::m_Singleton)
+  if (nullptr == Engine::m_Singleton) {
     FAG_HEAP_CONSTRUCT(Engine, Engine::m_Singleton, ());
+  }
 
   return Engine::m_Singleton;
 }

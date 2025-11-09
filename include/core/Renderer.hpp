@@ -11,11 +11,11 @@
 
 namespace fag {
 
+class Mesh;
+class Shader;
+
 class Renderer {
 public:
-  class Shader;
-  class Mesh;
-
   enum RenderContextIndex : size_t;
   enum class ShaderStage;
 
@@ -35,7 +35,7 @@ public:
   // virtual void /* return datatype ? */
   // create_render_context(void /* creation data datatype? */) = 0;
 
-  virtual void set_shapes(const std::vector<Renderer::Mesh *> &) = 0;
+  virtual void set_shapes(const std::vector<Mesh *> &) = 0;
 
 public:
   template <class T> constexpr bool is() const {
@@ -55,24 +55,17 @@ protected:
   static const size_t BASE_RENDER_CONTEXT_COUNT = 2;
 
 public:
-  // nested type declarations
+  // nested type definitions
   enum RenderContextIndex : size_t {
     Default3D = std::numeric_limits<size_t>::max(),
     Default2D = std::numeric_limits<size_t>::max() - 1,
   };
 
-  class Shader {};
   enum class ShaderStage {
     Vertex,
     Geometry,
     Fragment,
     PixelShading = Fragment
-  };
-
-  class Mesh {
-  public:
-    virtual Mesh *clone(void) = 0;
-    virtual ~Mesh(void);
   };
 };
 
