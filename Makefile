@@ -85,26 +85,46 @@ $(OBJECTS_FOLDER):
 
 MKDIR_COMMAND = if ! [ -d "$(dir $@)" ]; then mkdir -p $(dir $@); fi
 
-# $(1) is lib
-define new-obj-target
-$(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%,$(OBJECTS_RELEASE_C)): $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%$(OBJ_EXT): $(SOURCE_FOLDER)/$(1)/%.c
+# $(1) is object file
+# $(2) is source file
+define new-rel-c
+$(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CC) $(CFLAGS) $$(alloc_new_rel_flags) -g -c $$< -o $$@
-
-$(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%,$(OBJECTS_DEBUG_C)): $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%$(DEBUG_SUFFIX)$(OBJ_EXT): $(SOURCE_FOLDER)/$(1)/%.c
+	$(CC) $(CFLAGS) -c $$< -o $$@
+endef
+define new-dbg-c
+$(1): $(2)
 	$$(MKDIR_COMMAND)
 	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -c $$< -o $$@
-
-$(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%,$(OBJECTS_RELEASE_CPP)): $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%$(OBJ_EXT): $(SOURCE_FOLDER)/$(1)/%.cpp
+endef
+define new-rel-cpp
+$(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CCPLUS) $(CPPFLAGS) $$(alloc_new_rel_flags) -c $$< -o $$@
-
-$(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%,$(OBJECTS_DEBUG_CPP)): $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(subst /,_,$(1))_%$(DEBUG_SUFFIX)$(OBJ_EXT): $(SOURCE_FOLDER)/$(1)/%.cpp
+	$(CCPLUS) $(CPPFLAGS) -c $$< -o $$@
+endef
+define new-dbg-cpp
+$(1): $(2)
 	$$(MKDIR_COMMAND)
 	$(CCPLUS) $(CPPFLAGS) $(DEBUG_FLAGS) -c $$< -o $$@
 endef
 
-$(foreach lib,$(LIBRARY_NAMES),$(eval $(call new-obj-target,$(lib))))
+# $(1) is lib
+define new-lib-target
+
+$(1)_rel_c := $(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%,$(OBJECTS_RELEASE_c))
+$(1)_dbg_c := $(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%,(OBJECTS_DEBUG_c))
+
+$(1)_rel_cpp := $(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%,$(OBJECTS_RELEASE_cpp))
+$(1)_dbg_cpp := $(filter $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%,$(OBJECTS_DEBUG_cpp))
+
+$$(foreach rel_c,$$($(1)_rel_c),$$(eval $$(call new-rel-c,$$(rel_c),$$(subst _,/,$$(patsubst $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%$(OBJ_EXT),$(SOURCE_FOLDER)/$(1)/%.c,$$(rel_c))))))
+$$(foreach dbg_c,$$($(1)_dbg_c),$$(eval $$(call new-dbg-c,$$(dbg_c),$$(subst _,/,$$(patsubst $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%$(DEBUG_SUFFIX)$(OBJ_EXT),$(SOURCE_FOLDER)/$(1)/%.c,$$(dbg_c))))))
+$$(foreach rel_cpp,$$($(1)_rel_cpp),$$(eval $$(call new-rel-cpp,$$(rel_cpp),$$(subst _,/,$$(patsubst $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%$(OBJ_EXT),$(SOURCE_FOLDER)/$(1)/%.cpp,$$(rel_cpp))))))
+$$(foreach dbg_cpp,$$($(1)_dbg_cpp),$$(eval $$(call new-dbg-cpp,$$(dbg_cpp),$$(subst _,/,$$(patsubst $(OBJECTS_FOLDER)/$(1)/$(PREFIX)$(1)_%$(DEBUG_SUFFIX)$(OBJ_EXT),$(SOURCE_FOLDER)/$(1)/%.cpp,$$(dbg_cpp))))))
+
+endef
+
+$(foreach lib,$(LIBRARY_NAMES),$(eval $(call new-lib-target,$(lib))))
 
 # $(RELEASE_APP): LDFLAGS += -s
 $(RELEASE_APP): $(MAIN_CPP) $(LIBS_RELEASE)
