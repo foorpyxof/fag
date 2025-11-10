@@ -91,7 +91,7 @@ MKDIR_COMMAND = @mkdir -p $(dir $@)
 define new-rel-c
 $(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CC) $(CFLAGS) -c $$< -o $$@
+	$(CC) $(CFLAGS) $(RELEASE_FLAGS) -c $$< -o $$@
 endef
 define new-dbg-c
 $(1): $(2)
@@ -101,7 +101,7 @@ endef
 define new-rel-cpp
 $(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CCPLUS) $(CPPFLAGS) -c $$< -o $$@
+	$(CCPLUS) $(CPPFLAGS) $(RELEASE_FLAGS) -c $$< -o $$@
 endef
 define new-dbg-cpp
 $(1): $(2)

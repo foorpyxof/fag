@@ -1,9 +1,11 @@
-#ifndef FAG_CORE_VULKANMESH_HPP
-#define FAG_CORE_VULKANMESH_HPP
+#ifndef FAG_CORE_VULKAN_MESH_HPP
+#define FAG_CORE_VULKAN_MESH_HPP
 
 #include "../Mesh.hpp"
 
+extern "C" {
 #include "../../../modules/fpxlib3d/include/vk/shape.h"
+}
 
 namespace fag {
 namespace Vulkan {
@@ -19,4 +21,4 @@ private:
 } // namespace Vulkan
 } // namespace fag
 
-#endif // FAG_CORE_VULKANMESH_HPP
+#endif // FAG_CORE_VULKAN_MESH_HPP

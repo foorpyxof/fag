@@ -93,6 +93,9 @@ void Renderer::select_render_context(size_t idx) {
 
   m_SelectedPipeline = m_Pipelines[real_index];
 }
+IMPLEMENT_THIS(void Renderer::create_render_context(void *creation_info),
+               UNUSED(creation_info));
+
 IMPLEMENT_THIS(void Renderer::set_shapes(const std::vector<Mesh *> &shapes),
                UNUSED(shapes););
 

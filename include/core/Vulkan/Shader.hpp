@@ -1,5 +1,5 @@
-#ifndef FAG_CORE_VULKANSHADER_HPP
-#define FAG_CORE_VULKANSHADER_HPP
+#ifndef FAG_CORE_VULKAN_SHADER_HPP
+#define FAG_CORE_VULKAN_SHADER_HPP
 
 #include "../Shader.hpp"
 
@@ -11,4 +11,4 @@ class Shader : fag::Shader {};
 } // namespace Vulkan
 } // namespace fag
 
-#endif // FAG_CORE_VULKANSHADER_HPP
+#endif // FAG_CORE_VULKAN_SHADER_HPP

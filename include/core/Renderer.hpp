@@ -25,15 +25,16 @@ public:
                                               ShaderStage shader_stage) = 0;
 
   // Render contexts:
-  // for the Vulkan renderer, these are the pipelines
+  // e.g.: for the Vulkan renderer, these are the pipelines
   //
   // Universally, all of the renderers MUST have at least two default
   // render contexts, namely:
   // - Default 3D
   // - Default 2D
   virtual void select_render_context(size_t idx) = 0;
-  // virtual void /* return datatype ? */
-  // create_render_context(void /* creation data datatype? */) = 0;
+
+  // There is also the ability to create new, custom render contexts
+  virtual void create_render_context(void *) = 0;
 
   virtual void set_shapes(const std::vector<Mesh *> &) = 0;
 

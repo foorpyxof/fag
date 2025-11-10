@@ -55,7 +55,8 @@ CORE_DEPS := $(foreach dep,$(CORE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx
 
 # for the Vulkan renderer
 $(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(LIB_EXT): $(CORE_DEPS)
-$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
+# $(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
+$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(CORE_DEPS)
 
 define new-lib-target
 

@@ -1,14 +1,13 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#ifndef FAG_CORE_VULKANRENDERER_HPP
-#define FAG_CORE_VULKANRENDERER_HPP
+#ifndef FAG_CORE_VULKAN_RENDERER_HPP
+#define FAG_CORE_VULKAN_RENDERER_HPP
 
 #include "../Renderer.hpp"
 
 extern "C" {
-#include "fpxlib3d/include/vk.h"
-#include "fpxlib3d/include/vk/typedefs.h"
+#include "../../../modules/fpxlib3d/include/vk.h"
 }
 
 #include <cstddef>
@@ -26,7 +25,10 @@ public:
   void render_frame(void);
   std::weak_ptr<Shader> create_shader(std::string &resource_path,
                                       ShaderStage stage_flag);
+
   void select_render_context(size_t idx);
+  void create_render_context(void *);
+
   void set_shapes(const std::vector<Mesh *> &);
 
 public:
@@ -65,4 +67,4 @@ public:
 } // namespace Vulkan
 } // namespace fag
 
-#endif // FAG_CORE_VULKANRENDERER_HPP
+#endif // FAG_CORE_VULKAN_RENDERER_HPP
