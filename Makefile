@@ -83,7 +83,8 @@ libs: $(LIBS_RELEASE) $(LIBS_DEBUG)
 $(OBJECTS_FOLDER):
 	mkdir -p $@
 
-MKDIR_COMMAND = if ! [ -d "$(dir $@)" ]; then mkdir -p $(dir $@); fi
+MKDIR_COMMAND = @mkdir -p $(dir $@)
+# MKDIR_COMMAND = if ! [ -d "$(dir $@)" ]; then mkdir -p $(dir $@); fi
 
 # $(1) is object file
 # $(2) is source file

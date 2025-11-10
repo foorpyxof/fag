@@ -1,4 +1,4 @@
-#include "core/VulkanMesh.hpp"
+#include "core/Vulkan/Mesh.hpp"
 
 #include "dev/allocators.hpp"
 

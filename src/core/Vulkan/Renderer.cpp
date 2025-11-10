@@ -1,7 +1,7 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "core/VulkanRenderer.hpp"
+#include "core/Vulkan/Renderer.hpp"
 
 #include "dev/allocators.hpp"
 

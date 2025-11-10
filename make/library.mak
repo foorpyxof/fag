@@ -1,9 +1,9 @@
-LIBRARY_NAMES := core os error
+LIBRARY_NAMES := $(notdir $(shell find $(SOURCE_FOLDER) -mindepth 1 -maxdepth 1 -type d | sort))
+LIBRARY_NAMES := $(subst /,_,$(LIBRARY_NAMES))
 
 OBJECTS_FOLDER := $(BUILD_FOLDER)/objects
 LIBRARY_FOLDER := $(BUILD_FOLDER)/lib
 
-LIBRARY_NAMES := $(subst /,_,$(LIBRARY_NAMES))
 
 # $1 is library
 # $2 is extension

@@ -4,7 +4,7 @@
 #ifndef FAG_CORE_VULKANRENDERER_HPP
 #define FAG_CORE_VULKANRENDERER_HPP
 
-#include "./Renderer.hpp"
+#include "../Renderer.hpp"
 
 extern "C" {
 #include "fpxlib3d/include/vk.h"

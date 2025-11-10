@@ -13,6 +13,7 @@
 #include "./core/SceneManager.hpp"
 #include "./core/Transforms.hpp"
 #include "./core/Vectors.hpp"
-#include "./core/VulkanRenderer.hpp"
+
+#include "./core/Vulkan/Renderer.hpp"
 
 #endif // FAG_CORE_HPP

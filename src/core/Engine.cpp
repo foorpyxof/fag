@@ -3,7 +3,7 @@
 
 #include "core/Renderer.hpp"
 #include "core/SceneManager.hpp"
-#include "core/VulkanRenderer.hpp"
+#include "core/Vulkan/Renderer.hpp"
 
 #include "error/Generic.hpp"
 

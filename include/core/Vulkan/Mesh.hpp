@@ -1,9 +1,9 @@
 #ifndef FAG_CORE_VULKANMESH_HPP
 #define FAG_CORE_VULKANMESH_HPP
 
-#include "./Mesh.hpp"
+#include "../Mesh.hpp"
 
-#include "../../modules/fpxlib3d/include/vk/shape.h"
+#include "../../../modules/fpxlib3d/include/vk/shape.h"
 
 namespace fag {
 namespace Vulkan {
