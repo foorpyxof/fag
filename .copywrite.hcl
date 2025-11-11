@@ -9,5 +9,6 @@ project {
 
   header_ignore = [
     "modules/**",
+    "include/header_template.hpp"
   ]
 }

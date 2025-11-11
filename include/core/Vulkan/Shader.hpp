@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #ifndef FAG_CORE_VULKAN_SHADER_HPP
 #define FAG_CORE_VULKAN_SHADER_HPP
 

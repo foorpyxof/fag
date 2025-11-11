@@ -1,3 +1,6 @@
+// Copyright (c) Erynn Scholtes
+// SPDX-License-Identifier: MIT
+
 #include "core/Vulkan/Mesh.hpp"
 
 #include "dev/allocators.hpp"
