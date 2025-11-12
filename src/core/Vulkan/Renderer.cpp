@@ -53,26 +53,6 @@ struct default2d_pipeline_descriptor_bindings {
 namespace fag {
 namespace Vulkan {
 
-/* static initializations */
-Renderer *Renderer::m_Singleton = nullptr;
-
-/* public static methods */
-Renderer *Renderer::get_singleton(void) {
-  if (nullptr == Renderer::m_Singleton) {
-    FAG_HEAP_CONSTRUCT(Renderer, Renderer::m_Singleton, ());
-  }
-
-  return Renderer::m_Singleton;
-}
-
-void Renderer::destroy_singleton(void) {
-  if (nullptr == Renderer::m_Singleton)
-    return;
-
-  delete Renderer::m_Singleton;
-  Renderer::m_Singleton = nullptr;
-}
-
 #define INIT_WINDOW_WIDTH 500
 #define INIT_WINDOW_HEIGHT 500
 
@@ -93,8 +73,9 @@ void Renderer::select_render_context(size_t idx) {
 
   m_SelectedPipeline = m_Pipelines[real_index];
 }
-IMPLEMENT_THIS(void Renderer::create_render_context(void *creation_info),
-               UNUSED(creation_info));
+IMPLEMENT_THIS(size_t Renderer::create_render_context(void *creation_info),
+               UNUSED(creation_info);
+               return 0;);
 
 IMPLEMENT_THIS(void Renderer::set_shapes(const std::vector<Mesh *> &shapes),
                UNUSED(shapes););

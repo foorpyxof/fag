@@ -20,11 +20,12 @@ public:
   static Engine *get_singleton(void);
   static void destroy_singleton(void);
 
-  static const Allocator &get_custom_allocator(void);
   static void set_custom_allocator(Allocator &);
+  static const Allocator &get_custom_allocator(void);
 
 public:
   void assign_renderer(Renderer *);
+  Renderer *get_renderer(void);
 
   size_t add_scene(Scene &);
 

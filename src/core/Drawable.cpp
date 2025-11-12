@@ -10,7 +10,7 @@ namespace fag {
 
 std::weak_ptr<Mesh> Drawable::get_mesh(void) const { return m_Mesh; }
 
-void Drawable::swap_mesh(std::shared_ptr<Mesh> &new_mesh) {
+void Drawable::set_mesh(std::shared_ptr<Mesh> &new_mesh) {
   m_Mesh = std::shared_ptr<Mesh>(new_mesh);
 }
 

@@ -13,9 +13,9 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
-class Mesh : fag::Mesh {
+class Mesh : public fag::Mesh {
 public:
-  fag::Mesh *clone(void);
+  std::shared_ptr<fag::Mesh> clone(void);
 
 private:
   Fpx3d_Vk_ShapeBuffer m_VulkanShapeBuffer;

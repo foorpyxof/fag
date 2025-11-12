@@ -16,4 +16,6 @@
 
 #include "./core/Vulkan/Renderer.hpp"
 
+#include "./core/Globals.hpp"
+
 #endif // FAG_CORE_HPP

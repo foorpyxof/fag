@@ -34,7 +34,7 @@ public:
   virtual void select_render_context(size_t idx) = 0;
 
   // There is also the ability to create new, custom render contexts
-  virtual void create_render_context(void *) = 0;
+  virtual size_t create_render_context(void *) = 0;
 
   virtual void set_shapes(const std::vector<Mesh *> &) = 0;
 

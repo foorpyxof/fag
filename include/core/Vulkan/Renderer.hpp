@@ -18,27 +18,18 @@ namespace Vulkan {
 
 class Renderer : public fag::Renderer {
 public:
-  static Renderer *get_singleton(void);
-  static void destroy_singleton(void);
-
-public:
   void render_frame(void);
   std::weak_ptr<Shader> create_shader(std::string &resource_path,
                                       ShaderStage stage_flag);
 
   void select_render_context(size_t idx);
-  void create_render_context(void *);
+  size_t create_render_context(void *);
 
-  void set_shapes(const std::vector<Mesh *> &);
+  void set_shapes(const std::vector<fag::Mesh *> &);
 
 public:
-  ~Renderer(void);
-
-protected:
   Renderer(void);
-
-private:
-  static Renderer *m_Singleton;
+  ~Renderer(void);
 
 private:
   void _vulkan_setup(void);

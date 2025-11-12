@@ -13,7 +13,7 @@ class Mesh;
 class Drawable {
 public:
   std::weak_ptr<Mesh> get_mesh(void) const;
-  void swap_mesh(std::shared_ptr<Mesh> &);
+  void set_mesh(std::shared_ptr<Mesh> &);
   void make_mesh_unique(void);
 
 private:

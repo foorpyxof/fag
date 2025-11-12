@@ -9,7 +9,7 @@
 namespace fag {
 namespace Vulkan {
 
-class Shader : fag::Shader {};
+class Shader : public fag::Shader {};
 
 } // namespace Vulkan
 } // namespace fag

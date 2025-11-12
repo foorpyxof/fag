@@ -1,11 +1,10 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "core/Vulkan/Renderer.hpp"
 #include "fag.hpp"
 
-extern "C" {
 #include "macros.hpp"
-}
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,12 +29,10 @@ public:
 };
 
 int main(void) {
-  fag::Engine *engine = fag::Engine::get_singleton();
-  fag::Renderer *renderer = fag::Vulkan::Renderer::get_singleton();
-  engine->assign_renderer(renderer);
+  g_Engine->assign_renderer(new fag::Vulkan::Renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
-  std::cout << (renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
+  std::cout << (g_Renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
             << std::endl;
 
   fag::Entity3D *ent_3d = new fag::Entity3D;
@@ -51,9 +48,9 @@ int main(void) {
   my_scene.set_loader(my_scene_loader);
   my_scene.set_unloader(my_scene_unloader);
 
-  engine->add_scene(my_scene);
+  g_Engine->add_scene(my_scene);
 
-  engine->start();
+  g_Engine->start();
 
   fag::Engine::destroy_singleton();
 }

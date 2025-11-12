@@ -48,7 +48,10 @@ const Allocator &Engine::get_custom_allocator(void) {
 }
 
 void Engine::set_custom_allocator(Allocator &allocator) {
-  if (m_Singleton && m_Singleton->m_Running)
+  if (!m_Singleton)
+    return;
+
+  if (m_Singleton->m_Running)
     throw Error::Generic(
         "cannot assign a custom allocator while the engine is running");
 
@@ -58,7 +61,18 @@ void Engine::set_custom_allocator(Allocator &allocator) {
   m_CustomAllocator = allocator;
 }
 
-void Engine::assign_renderer(Renderer *r) { m_Renderer = r; }
+void Engine::assign_renderer(Renderer *r) {
+  if (m_Running)
+    throw Error::Generic(
+        "cannot assign a renderer while the engine is running");
+
+  m_Renderer = r;
+}
+Renderer *Engine::get_renderer(void) { return m_Renderer; }
+
+size_t Engine::add_scene(Scene &to_append) {
+  return m_SceneManager->append_scene(to_append);
+}
 
 int Engine::start(void) {
   /*
@@ -82,10 +96,6 @@ int Engine::start(void) {
   _teardown();
 
   return 0;
-}
-
-size_t Engine::add_scene(Scene &to_append) {
-  return m_SceneManager->append_scene(to_append);
 }
 
 void Engine::raise_stop_condition(void) { m_ShouldStop = true; }
