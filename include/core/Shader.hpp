@@ -6,7 +6,15 @@
 
 namespace fag {
 
-class Shader {};
+enum class ShaderStage { Vertex, Geometry, Fragment, PixelShading = Fragment };
+
+class Shader {
+public:
+  virtual ~Shader(void) {};
+
+protected:
+  Shader(void);
+};
 
 } // namespace fag
 

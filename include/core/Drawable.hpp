@@ -16,6 +16,8 @@ public:
   void set_mesh(std::shared_ptr<Mesh> &);
   void make_mesh_unique(void);
 
+  void draw_object(void);
+
 private:
   std::shared_ptr<Mesh> m_Mesh;
 };

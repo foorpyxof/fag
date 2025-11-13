@@ -24,41 +24,41 @@ extern "C" {
 
 namespace fag {
 
-Engine *Engine::m_Singleton = nullptr;
-Allocator Engine::m_CustomAllocator = {};
+Engine *Engine::s_Singleton = nullptr;
+Allocator Engine::s_CustomAllocator = {};
 
 Engine *Engine::get_singleton(void) {
-  if (nullptr == Engine::m_Singleton) {
-    FAG_HEAP_CONSTRUCT(Engine, Engine::m_Singleton, ());
+  if (nullptr == Engine::s_Singleton) {
+    FAG_HEAP_CONSTRUCT(Engine, Engine::s_Singleton, ());
   }
 
-  return Engine::m_Singleton;
+  return Engine::s_Singleton;
 }
 
 void Engine::destroy_singleton(void) {
-  if (nullptr == Engine::m_Singleton)
+  if (nullptr == Engine::s_Singleton)
     return;
 
-  delete Engine::m_Singleton;
-  Engine::m_Singleton = nullptr;
+  delete Engine::s_Singleton;
+  Engine::s_Singleton = nullptr;
 }
 
 const Allocator &Engine::get_custom_allocator(void) {
-  return m_CustomAllocator;
+  return s_CustomAllocator;
 }
 
 void Engine::set_custom_allocator(Allocator &allocator) {
-  if (!m_Singleton)
+  if (!s_Singleton)
     return;
 
-  if (m_Singleton->m_Running)
+  if (s_Singleton->m_Running)
     throw Error::Generic(
         "cannot assign a custom allocator while the engine is running");
 
   if (!allocator.alloc_func || !allocator.free_func)
     return;
 
-  m_CustomAllocator = allocator;
+  s_CustomAllocator = allocator;
 }
 
 void Engine::assign_renderer(Renderer *r) {

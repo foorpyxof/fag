@@ -1,7 +1,7 @@
 ZIPS_DIR := archives
 
 ZIP_FILE_NAME := fag_engine
-DONT_ZIP_DIRS := .git .cache scripts $(ZIPS_DIR) $(MODULES_DIR) $(OBJECTS_FOLDER)
+DONT_ZIP_DIRS := .git .cache scripts $(ZIPS_DIR) $(MODULES_DIR) $(BUILD_FOLDER)
 DONT_ZIP_FILES := $(RELEASE_APP) $(DEBUG_APP) compile_commands.json .gitattributes .gitignore .copywrite.hcl
 
 ZIP_FILE_NAME := $(ZIP_FILE_NAME)-$(TARGET)
@@ -41,7 +41,7 @@ endif
 
 FULL_ZIP_NAME := $(ZIP_FILE_NAME).$(ZIP_EXTENSION)
 
-ZIP_COMMAND += $(FULL_ZIP_NAME) $(EXCLUDE) $(ROOT_DIR_NAME)
+ZIP_COMMAND += $(FULL_ZIP_NAME) $(EXCLUDE) $(ROOT_DIR_NAME) $(ROOT_DIR_NAME)/$(FINAL_LIB_RELEASE) $(ROOT_DIR_NAME)/$(FINAL_LIB_DEBUG)
 ZIP_COMMAND += ;
 ZIP_COMMAND += mv $(FULL_ZIP_NAME) $(ROOT_DIR)/$(ZIPS_DIR)
 

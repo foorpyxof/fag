@@ -6,6 +6,8 @@
 
 #include "../Renderer.hpp"
 
+#include "../Shader.hpp"
+
 extern "C" {
 #include "../../../modules/fpxlib3d/include/vk.h"
 }
@@ -19,8 +21,9 @@ namespace Vulkan {
 class Renderer : public fag::Renderer {
 public:
   void render_frame(void);
-  std::weak_ptr<Shader> create_shader(std::string &resource_path,
-                                      ShaderStage stage_flag);
+
+  std::unique_ptr<Shader> create_shader(std::string &resource_path,
+                                        ShaderStage stage_flag);
 
   void select_render_context(size_t idx);
   size_t create_render_context(void *);

@@ -54,26 +54,40 @@ CORE_DEPS := vk window general
 CORE_DEPS := $(foreach dep,$(CORE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx3d_$(dep)$(LIB_EXT))
 
 # for the Vulkan renderer
-$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(LIB_EXT): $(CORE_DEPS)
-# $(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
-$(LIBRARY_FOLDER)/$(LIB_PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(CORE_DEPS)
+$(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(LIB_EXT): $(CORE_DEPS)
+# $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
+$(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(CORE_DEPS)
+
+LIB_CREATE_COMMAND = $(AR) cr --thin $$@ $$^ && echo -e 'create $$@\naddlib $$@\nsave\nend' | ar -M
+
 
 define new-lib-target
 
 LIBS_RELEASE += $($(1)_NAME_REL)
 $($(1)_NAME_REL): $($(1)_OBJ_REL) | $(LIBRARY_FOLDER)
 	-if [ -f $$@ ]; then rm $$@; fi
-	$(AR) cr --thin $$@ $$^ && echo -e 'create $$@\naddlib $$@\nsave\nend' | ar -M
+	$(LIB_CREATE_COMMAND)
 
 LIBS_DEBUG += $($(1)_NAME_DEB)
 $($(1)_NAME_DEB): $($(1)_OBJ_DBG) | $(LIBRARY_FOLDER)
 	-if [ -f $$@ ]; then rm $$@; fi
-	$(AR) cr --thin $$@ $$^ && echo -e 'create $$@\naddlib $$@\nsave\nend' | ar -M
+	$(LIB_CREATE_COMMAND)
 
 endef
 
+FINAL_LIB_RELEASE := $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PROJECT_NAME)$(LIB_EXT)
+FINAL_LIB_DEBUG := $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PROJECT_NAME)$(DEBUG_SUFFIX)$(LIB_EXT)
+
 $(foreach lib,$(LIBRARY_NAMES),$(eval $(lib)_OBJ_REL := $(filter $(OBJECTS_FOLDER)/$(lib)/%,$(OBJECTS_RELEASE))) $(eval $(lib)_OBJ_DBG := $(filter $(OBJECTS_FOLDER)/$(lib)/%,$(OBJECTS_DEBUG))))
 
-$(foreach lib,$(LIBRARY_NAMES),$(eval $(lib)_NAME_REL := $(LIBRARY_FOLDER)/$(LIB_PREFIX)$(lib)$(LIB_EXT)) $(eval $(lib)_NAME_DEB := $(LIBRARY_FOLDER)/$(LIB_PREFIX)$(lib)$(DEBUG_SUFFIX)$(LIB_EXT)))
+$(foreach lib,$(LIBRARY_NAMES),$(eval $(lib)_NAME_REL := $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)$(lib)$(LIB_EXT)) $(eval $(lib)_NAME_DEB := $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)$(lib)$(DEBUG_SUFFIX)$(LIB_EXT)))
 
 $(foreach lib,$(LIBRARY_NAMES),$(eval $(call new-lib-target,$(lib))))
+
+$(FINAL_LIB_RELEASE): $(LIBS_RELEASE)
+	-if [ -f $@ ]; then rm $@; fi
+	$(AR) cr --thin $@ $^ && echo -e 'create $@\naddlib $@\nsave\nend' | ar -M
+
+$(FINAL_LIB_DEBUG): $(LIBS_DEBUG)
+	-if [ -f $@ ]; then rm $@; fi
+	$(AR) cr --thin $@ $^ && echo -e 'create $@\naddlib $@\nsave\nend' | ar -M

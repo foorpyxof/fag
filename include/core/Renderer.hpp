@@ -13,16 +13,17 @@ namespace fag {
 
 class Mesh;
 class Shader;
+enum class ShaderStage;
 
 class Renderer {
 public:
   enum RenderContextIndex : size_t;
-  enum class ShaderStage;
 
 public:
   virtual void render_frame(void) = 0;
-  virtual std::weak_ptr<Shader> create_shader(std::string &resource_path,
-                                              ShaderStage shader_stage) = 0;
+
+  virtual std::unique_ptr<Shader> create_shader(std::string &resource_path,
+                                                ShaderStage shader_stage) = 0;
 
   // Render contexts:
   // e.g.: for the Vulkan renderer, these are the pipelines
@@ -60,13 +61,6 @@ public:
   enum RenderContextIndex : size_t {
     Default3D = std::numeric_limits<size_t>::max(),
     Default2D = std::numeric_limits<size_t>::max() - 1,
-  };
-
-  enum class ShaderStage {
-    Vertex,
-    Geometry,
-    Fragment,
-    PixelShading = Fragment
   };
 };
 

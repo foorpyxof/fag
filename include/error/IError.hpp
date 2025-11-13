@@ -9,7 +9,7 @@
 namespace fag {
 namespace Error {
 
-class IError : std::exception {
+class IError : public std::exception {
 public:
   virtual ~IError() {}
 };

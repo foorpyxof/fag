@@ -2,22 +2,23 @@
 
 all: libs
 
+PROJECT_NAME := fag
+PREFIX := $(PROJECT_NAME)_
+LIB_PFX_OPT := lib
+DEBUG_SUFFIX := _debug
+
+include make/early.mak
+
 CC != which clang 2>/dev/null
 CCPLUS != which clang++ 2>/dev/null
 AR != which ar
 
-CC_WIN32 := x86_64-w64-mingw32-gcc
-CCPLUS_WIN32 := x86_64-w64-mingw32-g++
-AR_WIN32 := x86_64-w64-mingw32-ar
-
-include make/early.mak
+CC_WIN32 != which x86_64-w64-mingw32-gcc 2>/dev/null
+CCPLUS_WIN32 != which x86_64-w64-mingw32-g++ 2>/dev/null
+AR_WIN32 != which x86_64-w64-mingw32-ar 2>/dev/null
 
 WINDOWS_TARGET_NAME := win64
 LINUX_TARGET_NAME := linux
-
-PREFIX := fag_
-LIB_PREFIX := lib$(PREFIX)
-DEBUG_SUFFIX := _debug
 
 ifeq ($(WINDOWS),true)
 	TARGET := $(WINDOWS_TARGET_NAME)
@@ -44,6 +45,8 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 	EXE_EXT := .exe
 	OBJ_EXT := .obj
 	LIB_EXT := .lib
+
+	undefine LIB_PFX_OPT
 
 else
 
@@ -128,18 +131,18 @@ endef
 $(foreach lib,$(LIBRARY_NAMES),$(eval $(call new-lib-target,$(lib))))
 
 # $(RELEASE_APP): LDFLAGS += -s
-$(RELEASE_APP): $(MAIN_CPP) $(LIBS_RELEASE)
+$(RELEASE_APP): $(MAIN_CPP) $(FINAL_LIB_RELEASE)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
 	$(CCPLUS) $(CPPFLAGS) $< \
-	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-l$(patsubst lib%$(LIB_EXT),%,$(notdir $(lib)))) $(LDFLAGS) \
+	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(RELEASE_FLAGS) -o $@
 
-$(DEBUG_APP): $(MAIN_CPP) $(LIBS_DEBUG)
+$(DEBUG_APP): $(MAIN_CPP) $(FINAL_LIB_DEBUG)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
 	$(CCPLUS) $(CPPFLAGS) $< \
-	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-l$(patsubst lib%$(LIB_EXT),%,$(notdir $(lib)))) $(LDFLAGS) \
+	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(DEBUG_FLAGS) -o $@
 
 include make/zip.mak

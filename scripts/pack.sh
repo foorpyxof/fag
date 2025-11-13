@@ -17,8 +17,6 @@ for i in "$@"; do
 
   TARGET=$(echo -n "$i" | tr "[:lower:]" "[:upper:]")
 
-  $MAKE_CMD clean >/dev/null 2>&1
-
   tput setaf 33
   printf "\nBuilding for target %s\n" $i
   tput setaf sgr0

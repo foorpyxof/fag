@@ -60,7 +60,7 @@ namespace Vulkan {
 
 IMPLEMENT_THIS(void Renderer::render_frame(void), );
 
-IMPLEMENT_THIS(std::weak_ptr<Shader> Renderer::create_shader(
+IMPLEMENT_THIS(std::unique_ptr<Shader> Renderer::create_shader(
                    std::string &resource_path, ShaderStage stage_flags),
                UNUSED(resource_path);
                UNUSED(stage_flags); return {};);

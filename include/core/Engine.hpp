@@ -41,8 +41,8 @@ public:
   ~Engine(void);
 
 private:
-  static Engine *m_Singleton;
-  static Allocator m_CustomAllocator;
+  static Engine *s_Singleton;
+  static Allocator s_CustomAllocator;
 
 protected:
   Engine(void);
