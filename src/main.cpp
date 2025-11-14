@@ -30,7 +30,9 @@ public:
   ~MyEntity3D() { printf("goodbye !\n"); }
 };
 
-int engine_test(void) {
+int engine_test(int argc, char **argv) {
+  UNUSED(argc);
+  UNUSED(argv);
   g_Engine->assign_renderer(new fag::Vulkan::Renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
@@ -102,6 +104,6 @@ int file_test(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-  // return engine_test();
-  return file_test(argc, argv);
+  return engine_test(argc, argv);
+  // return file_test(argc, argv);
 }

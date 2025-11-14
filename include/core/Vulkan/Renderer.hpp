@@ -7,6 +7,7 @@
 #include "../Renderer.hpp"
 
 #include "../Shader.hpp"
+#include "os/File.hpp"
 
 extern "C" {
 #include "../../../modules/fpxlib3d/include/vk.h"
@@ -22,7 +23,7 @@ class Renderer : public fag::Renderer {
 public:
   void render_frame(void);
 
-  std::unique_ptr<Shader> create_shader(std::string &resource_path,
+  std::unique_ptr<Shader> create_shader(const OS::FileBuffer &shader_file,
                                         ShaderStage stage_flag);
 
   void select_render_context(size_t idx);

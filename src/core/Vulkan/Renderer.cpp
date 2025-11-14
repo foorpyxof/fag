@@ -61,8 +61,8 @@ namespace Vulkan {
 IMPLEMENT_THIS(void Renderer::render_frame(void), );
 
 IMPLEMENT_THIS(std::unique_ptr<Shader> Renderer::create_shader(
-                   std::string &resource_path, ShaderStage stage_flags),
-               UNUSED(resource_path);
+                   const OS::FileBuffer &shader_file, ShaderStage stage_flags),
+               UNUSED(shader_file);
                UNUSED(stage_flags); return {};);
 
 void Renderer::select_render_context(size_t idx) {

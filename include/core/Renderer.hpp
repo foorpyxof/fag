@@ -4,6 +4,8 @@
 #ifndef FAG_CORE_RENDERER_HPP
 #define FAG_CORE_RENDERER_HPP
 
+#include "../os/File.hpp"
+
 #include <limits>
 #include <memory>
 #include <string>
@@ -22,8 +24,9 @@ public:
 public:
   virtual void render_frame(void) = 0;
 
-  virtual std::unique_ptr<Shader> create_shader(std::string &resource_path,
-                                                ShaderStage shader_stage) = 0;
+  virtual std::unique_ptr<Shader>
+  create_shader(const OS::FileBuffer &shader_file,
+                ShaderStage shader_stage) = 0;
 
   // Render contexts:
   // e.g.: for the Vulkan renderer, these are the pipelines
