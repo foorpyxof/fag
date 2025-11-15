@@ -23,8 +23,8 @@ class Renderer : public fag::Renderer {
 public:
   void render_frame(void);
 
-  std::unique_ptr<Shader> create_shader(const OS::FileBuffer &shader_file,
-                                        ShaderStage stage_flag);
+  std::unique_ptr<fag::Shader> create_shader(const OS::FileBuffer &shader_file,
+                                             ShaderStage stage_flag);
 
   void select_render_context(size_t idx);
   size_t create_render_context(void *);

@@ -1,11 +1,13 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "core/Vulkan/Renderer.hpp"
-
+#include "core/Vulkan/Shader.hpp"
 #include "dev/allocators.hpp"
+#include "dev/smartptrs.hpp"
 
 #include "macros.hpp"
+
+#include "core/Vulkan/Renderer.hpp"
 
 extern "C" {
 #include "fpxlib3d/include/vk.h"
@@ -15,6 +17,7 @@ extern "C" {
 #include "glfw/include/GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
 
+#include <memory>
 #include <stdexcept>
 
 static bool s_VulkanSettingsInitialized = false;
@@ -60,10 +63,15 @@ namespace Vulkan {
 
 IMPLEMENT_THIS(void Renderer::render_frame(void), );
 
-IMPLEMENT_THIS(std::unique_ptr<Shader> Renderer::create_shader(
-                   const OS::FileBuffer &shader_file, ShaderStage stage_flags),
-               UNUSED(shader_file);
-               UNUSED(stage_flags); return {};);
+std::unique_ptr<fag::Shader>
+Renderer::create_shader(const OS::FileBuffer &shader_file,
+                        ShaderStage stage_flags) {
+  fag::Shader *FAG_HEAP_CONSTRUCT(Shader, new_shader,
+                                  (shader_file, stage_flags));
+
+  std::unique_ptr<fag::Shader> return_value = fag::_dev::unique_ptr(new_shader);
+  return return_value;
+}
 
 void Renderer::select_render_context(size_t idx) {
   size_t real_index = _convert_render_context_index(idx);

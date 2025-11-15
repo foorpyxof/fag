@@ -6,7 +6,11 @@
 
 #include "../Shader.hpp"
 
+#include "../../os/File.hpp"
+
+extern "C" {
 #include "../../../modules/fpxlib3d/include/vk/shaders.h"
+}
 
 namespace fag {
 namespace Vulkan {
@@ -18,7 +22,7 @@ public:
   ~Shader(void);
 
 protected:
-  Shader(const char *resource_path, ShaderStage);
+  Shader(const OS::FileBuffer &shader_file, ShaderStage);
 
 private:
   ShaderStage m_ShaderStage;

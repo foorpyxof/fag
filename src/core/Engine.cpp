@@ -105,18 +105,7 @@ IMPLEMENT_THIS(void Engine::_teardown(void), m_Running = false;
                FAG_DEBUG("Destroying F.A.G. engine");)
 
 Engine::Engine() : m_Running(false), m_ShouldStop(false), m_Renderer(nullptr) {
-
   FAG_HEAP_CONSTRUCT(SceneManager, m_SceneManager, ());
-
-  char line_info[32]{0};
-  FAG_LINE_INFO(line_info);
-  std::ostringstream message;
-  message << "Friendly reminder to all of the F.A.G. developers that any "
-             "std::shared_ptr<> should be constructed with the deleter of "
-             "programmer's choice (if it exists) "
-             "(at "
-          << line_info << ")";
-  FAG_WARN("%s", message.str().c_str());
 }
 Engine::~Engine(void) {}
 

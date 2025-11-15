@@ -1,8 +1,11 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
-#include "core/Drawable.hpp"
+#include "core/Mesh.hpp"
+
 #include "macros.hpp"
+
+#include "core/Drawable.hpp"
 
 #include <memory>
 
@@ -14,8 +17,6 @@ void Drawable::set_mesh(std::shared_ptr<Mesh> &new_mesh) {
   m_Mesh = std::shared_ptr<Mesh>(new_mesh);
 }
 
-void Drawable::make_mesh_unique(void) {
-  // std::shared_ptr<Mesh> new_mesh = std::shared_ptr
-}
+void Drawable::make_mesh_unique(void) { m_Mesh = m_Mesh->clone(); }
 
 } // namespace fag

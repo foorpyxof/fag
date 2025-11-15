@@ -10,7 +10,7 @@ enum class ShaderStage { Vertex, Geometry, Fragment, PixelShading = Fragment };
 
 class Shader {
 public:
-  virtual ~Shader(void) {};
+  virtual ~Shader(void);
 
 protected:
   Shader(void);

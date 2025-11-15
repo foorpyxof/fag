@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 #include "core/Vulkan/Renderer.hpp"
-#include "debug.h"
 #include "dev/allocators.hpp"
+#include "dev/smartptrs.hpp"
 
+#include "debug.h"
 #include "macros.hpp"
 
 #include "core/Vulkan/Mesh.hpp"
@@ -17,7 +18,7 @@ std::shared_ptr<fag::Mesh> Mesh::clone(void) {
 
   Mesh *cloned_mesh;
   FAG_HEAP_CONSTRUCT(Mesh, cloned_mesh, (*this));
-  std::shared_ptr<fag::Mesh> ptr(cloned_mesh);
+  std::shared_ptr<fag::Mesh> ptr = _dev::shared_ptr(cloned_mesh);
 
   FAG_TODO("create a function within Fpx3d_Vk for cloning a shapebuffer");
   // copy m_VulkanShapeBuffer (of type Fpx3d_Vk_Shapebuffer)

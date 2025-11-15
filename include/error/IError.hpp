@@ -11,7 +11,7 @@ namespace Error {
 
 class IError : public std::exception {
 public:
-  virtual ~IError() {}
+  virtual ~IError();
 };
 
 }; // namespace Error
