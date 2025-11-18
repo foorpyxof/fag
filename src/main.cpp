@@ -1,6 +1,9 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "core/Globals.hpp"
+#include "core/Shader.hpp"
+#include "core/Vulkan/Shader.hpp"
 #include "error/IError.hpp"
 #include "fag.hpp"
 
@@ -11,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <memory>
 
 fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
   UNUSED(to_load);
@@ -30,14 +34,31 @@ public:
   ~MyEntity3D() { printf("goodbye !\n"); }
 };
 
-int engine_test(int argc, char **argv) {
-  UNUSED(argc);
-  UNUSED(argv);
+int vulkan_renderer_setup(void) {
   g_Engine->assign_renderer(new fag::Vulkan::Renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
   std::cout << (g_Renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
             << std::endl;
+
+  fag::OS::FileBuffer vertex_shader_default("./shaders/default.vert.spv",
+                                            fag::OS::FileAccessMode::Read);
+  fag::OS::FileBuffer fragment_shader_default("./shaders/default.frag.spv",
+                                              fag::OS::FileAccessMode::Read);
+  fag::Vulkan::Shader vertex_shader(vertex_shader_default,
+                                    fag::ShaderStage::Vertex);
+  fag::Vulkan::Shader fragment_shader(fragment_shader_default,
+                                      fag::ShaderStage::Fragment);
+
+  return EXIT_SUCCESS;
+}
+
+int engine_test(int argc, char **argv) {
+  UNUSED(argc);
+  UNUSED(argv);
+
+  if (EXIT_SUCCESS != vulkan_renderer_setup())
+    return EXIT_FAILURE;
 
   fag::Entity3D *ent_3d = new fag::Entity3D;
 

@@ -63,16 +63,6 @@ namespace Vulkan {
 
 IMPLEMENT_THIS(void Renderer::render_frame(void), );
 
-std::unique_ptr<fag::Shader>
-Renderer::create_shader(const OS::FileBuffer &shader_file,
-                        ShaderStage stage_flags) {
-  fag::Shader *FAG_HEAP_CONSTRUCT(Shader, new_shader,
-                                  (shader_file, stage_flags));
-
-  std::unique_ptr<fag::Shader> return_value = fag::_dev::unique_ptr(new_shader);
-  return return_value;
-}
-
 void Renderer::select_render_context(size_t idx) {
   size_t real_index = _convert_render_context_index(idx);
 
@@ -81,16 +71,16 @@ void Renderer::select_render_context(size_t idx) {
 
   m_SelectedPipeline = m_Pipelines[real_index];
 }
-IMPLEMENT_THIS(size_t Renderer::create_render_context(void *creation_info),
+IMPLEMENT_THIS(size_t Renderer::create_render_context(
+                   const fag::RendercontextCreationInfo &creation_info),
                UNUSED(creation_info);
                return 0;);
 
 IMPLEMENT_THIS(void Renderer::set_shapes(const std::vector<Mesh *> &shapes),
                UNUSED(shapes););
 
-Renderer::Renderer(void) : m_Pipelines(Renderer::BASE_RENDER_CONTEXT_COUNT) {
-  UNUSED(m_VulkanContext);
-
+Renderer::Renderer(void)
+    : m_VulkanContext({}), m_Pipelines(Renderer::BASE_RENDER_CONTEXT_COUNT) {
   if (!s_VulkanSettingsInitialized) {
     fpx3d_vk_set_required_presentmodes(&s_SwapchainRequirements,
                                        s_VulkanPresentModes,

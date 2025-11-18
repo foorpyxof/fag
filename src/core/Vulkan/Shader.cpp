@@ -1,6 +1,7 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "debug.h"
 #include "error/Generic.hpp"
 #include "os/File.hpp"
 
@@ -23,12 +24,9 @@ namespace fag {
 namespace Vulkan {
 
 Shader::Shader(const OS::FileBuffer &shader_file, ShaderStage stage) {
-  UNUSED(shader_file);
-
   Fpx3d_Vk_E_ShaderStage shaderstage_converted = SHADER_STAGE_INVALID;
-  UNUSED(shaderstage_converted);
 
-  // turn the default 'fag::ShaderStage' value into
+  // turn the 'fag::ShaderStage' value into
   // a value that's valid for Fpx3d_Vk
   switch (stage) {
   case ShaderStage::Vertex:
@@ -48,13 +46,19 @@ Shader::Shader(const OS::FileBuffer &shader_file, ShaderStage stage) {
     break;
   }
 
-  /*
-   * TODO: create function `fpx3d_vk_read_spirv_data` in Fpx3d_Vk
-   */
-  // m_SpirvData = fpx3d_vk_read_spirv_file(path, shaderstage_converted);
+  uint8_t *spirv_bytes = new uint8_t[shader_file.get_size()];
+  shader_file.read(spirv_bytes, FAG_FILE_POSITION_END);
+
+  m_SpirvData = fpx3d_vk_read_spirv_data(spirv_bytes, shader_file.get_size(),
+                                         shaderstage_converted);
+
+  delete[] spirv_bytes;
 
   if (0 == m_SpirvData.filesize)
     throw fag::Error::Generic("an error occured while loading Vulkan shader");
+
+  FAG_DEBUG("Shader at '%s' loaded successfully",
+            shader_file.get_file_path().c_str());
 
   m_ShaderStage = stage;
 }

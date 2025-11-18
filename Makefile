@@ -10,11 +10,11 @@ DEBUG_SUFFIX := _debug
 include make/early.mak
 
 CC != which clang 2>/dev/null
-CCPLUS != which clang++ 2>/dev/null
+CXX != which clang++ 2>/dev/null
 AR != which ar
 
 CC_WIN32 != which x86_64-w64-mingw32-gcc 2>/dev/null
-CCPLUS_WIN32 != which x86_64-w64-mingw32-g++ 2>/dev/null
+CXX_WIN32 != which x86_64-w64-mingw32-g++ 2>/dev/null
 AR_WIN32 != which x86_64-w64-mingw32-ar 2>/dev/null
 
 WINDOWS_TARGET_NAME := win64
@@ -33,7 +33,7 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 	-include make/windows/*.mk
 
 	CC := $(CC_WIN32)
-	CCPLUS := $(CCPLUS_WIN32)
+	CXX := $(CCPLUS_WIN32)
 	AR := $(AR_WIN32)
 	CFLAGS += -mwindows
 	CPPFLAGS += -mwindows
@@ -53,7 +53,7 @@ else
 ifeq ($(CC),)
 	CC != which cc
 endif
-ifeq ($(CCPLUS),)
+ifeq ($(CXX),)
 	CC != which g++
 endif
 
@@ -104,12 +104,12 @@ endef
 define new-rel-cpp
 $(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CCPLUS) $(CPPFLAGS) $(RELEASE_FLAGS) -c $$< -o $$@
+	$(CXX) $(CPPFLAGS) $(RELEASE_FLAGS) -c $$< -o $$@
 endef
 define new-dbg-cpp
 $(1): $(2)
 	$$(MKDIR_COMMAND)
-	$(CCPLUS) $(CPPFLAGS) $(DEBUG_FLAGS) -c $$< -o $$@
+	$(CXX) $(CPPFLAGS) $(DEBUG_FLAGS) -c $$< -o $$@
 endef
 
 # $(1) is lib
@@ -134,14 +134,14 @@ $(foreach lib,$(LIBRARY_NAMES),$(eval $(call new-lib-target,$(lib))))
 $(RELEASE_APP): $(MAIN_CPP) $(FINAL_LIB_RELEASE)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
-	$(CCPLUS) $(CPPFLAGS) $< \
+	$(CXX) $(CPPFLAGS) $< \
 	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(RELEASE_FLAGS) -o $@
 
 $(DEBUG_APP): $(MAIN_CPP) $(FINAL_LIB_DEBUG)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
-	$(CCPLUS) $(CPPFLAGS) $< \
+	$(CXX) $(CPPFLAGS) $< \
 	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(DEBUG_FLAGS) -o $@
 

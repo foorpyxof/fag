@@ -1,7 +1,7 @@
 RELEASE_FLAGS := -DNDEBUG -O2
-DEBUG_FLAGS := -DDEBUG -g -O0 -DFAG_DEBUG_ENABLE
+DEBUG_FLAGS := -DDEBUG -g -O0 -DFAG_DEBUG_ENABLE 
 
-# DEBUG_FLAGS += -fsanitize=address
+DEBUG_FLAGS += -fsanitize=address
 # ^^^ uncomment for ASAN
 
 
@@ -20,10 +20,11 @@ LIB_DIRS := $(EXTRA_LIB_DIRS)
 
 # for Vulkan headers; we're using the same headers as the Vulkan library we're using
 INCLUDE_DIRS += $(MODULES_DIR)/fpxlib3d/modules/Vulkan-Headers/include
+INCLUDE_FLAGS := $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 
 # comp/link flags
-CFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
-CPPFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
+CFLAGS += $(INCLUDE_FLAGS)
+CPPFLAGS += $(INCLUDE_FLAGS)
 
 LDFLAGS += $(foreach dir,$(LIB_DIRS),-L$(dir))
 

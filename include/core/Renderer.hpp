@@ -17,16 +17,14 @@ class Mesh;
 class Shader;
 enum class ShaderStage;
 
+struct RendercontextCreationInfo;
+
 class Renderer {
 public:
   enum RenderContextIndex : size_t;
 
 public:
   virtual void render_frame(void) = 0;
-
-  virtual std::unique_ptr<Shader>
-  create_shader(const OS::FileBuffer &shader_file,
-                ShaderStage shader_stage) = 0;
 
   // Render contexts:
   // e.g.: for the Vulkan renderer, these are the pipelines
@@ -38,7 +36,7 @@ public:
   virtual void select_render_context(size_t idx) = 0;
 
   // There is also the ability to create new, custom render contexts
-  virtual size_t create_render_context(void *) = 0;
+  virtual size_t create_render_context(const RendercontextCreationInfo &) = 0;
 
   virtual void set_shapes(const std::vector<Mesh *> &) = 0;
 
@@ -66,6 +64,8 @@ public:
     Default2D = std::numeric_limits<size_t>::max() - 1,
   };
 };
+
+struct RendercontextCreationInfo {};
 
 } // namespace fag
 

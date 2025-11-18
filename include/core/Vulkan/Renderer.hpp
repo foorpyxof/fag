@@ -6,7 +6,8 @@
 
 #include "../Renderer.hpp"
 
-#include "../Shader.hpp"
+#include "./Shader.hpp"
+#include "fpxlib3d/include/vk/typedefs.h"
 #include "os/File.hpp"
 
 extern "C" {
@@ -19,15 +20,14 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
+struct RendercontextCreationInfo;
+
 class Renderer : public fag::Renderer {
 public:
   void render_frame(void);
 
-  std::unique_ptr<fag::Shader> create_shader(const OS::FileBuffer &shader_file,
-                                             ShaderStage stage_flag);
-
   void select_render_context(size_t idx);
-  size_t create_render_context(void *);
+  size_t create_render_context(const fag::RendercontextCreationInfo &);
 
   void set_shapes(const std::vector<fag::Mesh *> &);
 
@@ -55,8 +55,13 @@ private:
 
   std::vector<Fpx3d_Vk_Pipeline *> m_Pipelines;
   Fpx3d_Vk_Pipeline *m_SelectedPipeline = nullptr;
+};
 
-public:
+struct RendercontextCreationInfo : private fag::RendercontextCreationInfo {
+  fag::Vulkan::Shader *shaderArray;
+  size_t shaderCount;
+
+  Fpx3d_Vk_DescriptorSetBinding balls;
 };
 
 } // namespace Vulkan
