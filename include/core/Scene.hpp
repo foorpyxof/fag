@@ -4,13 +4,13 @@
 #ifndef FAG_CORE_SCENE_HPP
 #define FAG_CORE_SCENE_HPP
 
+#include "./BaseObject.hpp"
+
 #include <string>
 
 namespace fag {
 
-class SceneManager;
-
-class Scene {
+class Scene : public BaseObject {
 public:
   enum class LoadResult : int;
   typedef LoadResult (*LoadCallback)(Scene &);
@@ -29,7 +29,7 @@ private:
   LoadCallback _unload = nullptr;
 
 private:
-  friend SceneManager;
+  friend class SceneManager;
 
   bool m_IsLoaded;
 

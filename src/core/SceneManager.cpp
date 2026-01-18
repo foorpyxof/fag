@@ -18,6 +18,9 @@ extern "C" {
 
 namespace fag {
 
+SceneManager::SceneManager(void) : m_ActiveIndex(0) {}
+SceneManager::~SceneManager(void) {}
+
 bool SceneManager::load_scene_at(size_t index) {
   SCENE_INDEX_CHECK(index);
 
@@ -25,7 +28,8 @@ bool SceneManager::load_scene_at(size_t index) {
 
   Scene::LoadCallback load_func = scene._load;
   if (nullptr == load_func) {
-    FAG_WARN("Scene at index %" LONG_FORMAT "u has no loading function", index);
+    FAG_WARN(fag::SceneManager,
+             "Scene at index %" LONG_FORMAT "u has no loading function", index);
     return false;
   }
 
@@ -34,7 +38,8 @@ bool SceneManager::load_scene_at(size_t index) {
     unload_scene_at(index);
   }
 
-  FAG_DEBUG("Loading scene at index %" LONG_FORMAT "u", index);
+  FAG_DEBUG(fag::SceneManager, "Loading scene at index %" LONG_FORMAT "u",
+            index);
   if (Scene::LoadResult::Success != scene._load(scene)) {
     std::string msg = "Failed to load scene at index ";
     msg += std::to_string(index);
@@ -57,12 +62,14 @@ bool SceneManager::unload_scene_at(size_t index) {
     return true;
 
   if (nullptr == scene._unload) {
-    FAG_WARN("Scene at index %" LONG_FORMAT "u has no unloading function",
+    FAG_WARN(fag::SceneManager,
+             "Scene at index %" LONG_FORMAT "u has no unloading function",
              index);
     return false;
   }
 
-  FAG_DEBUG("Unloading scene at index %" LONG_FORMAT "u", index);
+  FAG_DEBUG(fag::SceneManager, "Unloading scene at index %" LONG_FORMAT "u",
+            index);
 
   scene._unload(scene);
   scene.m_IsLoaded = false;
@@ -78,7 +85,8 @@ bool SceneManager::activate_scene_at(size_t index) {
   if (false == scene.m_IsLoaded) {
     // scene is not loaded- oops
 
-    FAG_ERROR("Unable to activate scene at index %" LONG_FORMAT
+    FAG_ERROR(fag::SceneManager,
+              "Unable to activate scene at index %" LONG_FORMAT
               "u. Scene not loaded.",
               index);
 

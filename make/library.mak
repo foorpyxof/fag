@@ -56,10 +56,10 @@ CORE_DEPS := $(foreach dep,$(CORE_DEPS),$(MODULES_DIR)/fpxlib3d/build/lib/libfpx
 # for the Vulkan renderer
 $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(LIB_EXT): $(CORE_DEPS)
 
-ifeq ($(FPXLIB3D_DEBUG),)
-$(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(CORE_DEPS)
-else
+ifeq ($(FPXLIB3D_NODEBUG),)
 $(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(subst $(LIB_EXT),$(DEBUG_SUFFIX)$(LIB_EXT),$(CORE_DEPS))
+else
+$(LIBRARY_FOLDER)/$(LIB_PFX_OPT)$(PREFIX)core$(DEBUG_SUFFIX)$(LIB_EXT): $(CORE_DEPS)
 endif
 
 LIB_CREATE_COMMAND = $(AR) cr --thin $$@ $$^ && echo -e 'create $$@\naddlib $$@\nsave\nend' | ar -M

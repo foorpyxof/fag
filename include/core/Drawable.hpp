@@ -9,17 +9,17 @@
 namespace fag {
 
 class Mesh;
+class MeshInstance;
 
 class Drawable {
 public:
-  std::weak_ptr<Mesh> get_mesh(void) const;
-  void set_mesh(std::shared_ptr<Mesh> &);
+  std::weak_ptr<const MeshInstance> get_meshinstance(void) const;
+  std::weak_ptr<const Mesh> get_mesh(void) const;
+  void set_mesh(const std::weak_ptr<const Mesh> &);
   void make_mesh_unique(void);
 
-  void draw_object(void);
-
 private:
-  std::shared_ptr<Mesh> m_Mesh;
+  std::shared_ptr<MeshInstance> m_MeshInstance;
 };
 
 } // namespace fag

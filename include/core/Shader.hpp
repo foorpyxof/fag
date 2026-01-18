@@ -4,11 +4,13 @@
 #ifndef FAG_CORE_SHADER_HPP
 #define FAG_CORE_SHADER_HPP
 
+#include "./BaseObject.hpp"
+
 namespace fag {
 
 enum class ShaderStage { Vertex, Geometry, Fragment, PixelShading = Fragment };
 
-class Shader {
+class Shader : public BaseObject {
 public:
   virtual ~Shader(void);
 

@@ -12,12 +12,16 @@ namespace fag {
 namespace _dev {
 
 template <typename T>
-/* constexpr */ std::shared_ptr<T> shared_ptr(T *_src_ptr) {
-  return std::shared_ptr<T>{_src_ptr};
+constexpr ::std::shared_ptr<T> create_shared_ptr(T *_src_ptr) {
+  return ::std::shared_ptr<T>{_src_ptr};
 }
 template <typename T>
-/* constexpr */ std::unique_ptr<T> unique_ptr(T *_src_ptr) {
-  return std::unique_ptr<T>{_src_ptr};
+constexpr ::std::weak_ptr<T> create_weak_ptr(::std::shared_ptr<T> &_src_ptr) {
+  return ::std::weak_ptr<T>{_src_ptr};
+}
+template <typename T>
+constexpr ::std::unique_ptr<T> create_unique_ptr(T *_src_ptr) {
+  return ::std::unique_ptr<T>{_src_ptr};
 }
 
 } // namespace _dev

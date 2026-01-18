@@ -6,6 +6,7 @@
 #include "dev/smartptrs.hpp"
 
 #include "debug.h"
+#include "fpxlib3d/include/vk/typedefs.h"
 #include "macros.hpp"
 
 #include "core/Vulkan/Mesh.hpp"
@@ -18,7 +19,7 @@ std::shared_ptr<fag::Mesh> Mesh::clone(void) {
 
   Mesh *cloned_mesh;
   FAG_HEAP_CONSTRUCT(Mesh, cloned_mesh, (*this));
-  std::shared_ptr<fag::Mesh> ptr = _dev::shared_ptr(cloned_mesh);
+  std::shared_ptr<fag::Mesh> ptr = fag::_dev::create_shared_ptr(cloned_mesh);
 
   FAG_TODO("create a function within Fpx3d_Vk for cloning a shapebuffer");
   // copy m_VulkanShapeBuffer (of type Fpx3d_Vk_Shapebuffer)
@@ -27,6 +28,10 @@ std::shared_ptr<fag::Mesh> Mesh::clone(void) {
   // fpx3d_vk_clone_shapebuffer()
 
   return ptr;
+}
+
+const Fpx3d_Vk_ShapeBuffer &Mesh::get_vulkan_shapebuffer(void) const {
+  return m_VulkanShapeBuffer;
 }
 
 } // namespace Vulkan

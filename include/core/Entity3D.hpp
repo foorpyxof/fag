@@ -11,7 +11,7 @@
 
 namespace fag {
 
-class Entity3D : public Entity, Drawable {
+class Entity3D : public Entity, public Drawable {
 public:
   virtual void update(void);
   virtual void fixed_update(void);
@@ -25,8 +25,6 @@ public:
   virtual ~Entity3D(void);
 
 private:
-  friend class Renderer;
-
   Transform3D m_Transform;
   bool m_TransformHasChanged;
 };

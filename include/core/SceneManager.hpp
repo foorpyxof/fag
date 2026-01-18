@@ -4,6 +4,8 @@
 #ifndef FAG_CORE_SCENEMANAGER_HPP
 #define FAG_CORE_SCENEMANAGER_HPP
 
+#include "./BaseObject.hpp"
+
 #include "./Scene.hpp"
 
 #include <cstddef>
@@ -11,7 +13,7 @@
 
 namespace fag {
 
-class SceneManager {
+class SceneManager : public BaseObject {
 public:
   bool load_scene_at(size_t index);
   bool unload_scene_at(size_t index);
@@ -23,6 +25,10 @@ public:
 
   // also returns the index of the new scene
   size_t append_scene(Scene &);
+
+public:
+  SceneManager(void);
+  ~SceneManager(void);
 
 private:
   size_t m_ActiveIndex;

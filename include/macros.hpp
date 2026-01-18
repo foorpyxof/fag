@@ -20,6 +20,7 @@ extern "C" {
 #define IMPLEMENT_THIS(_func, _body)                                           \
   _func { _body FAG_TODO("Implement \"%s\"", #_func); }
 
+// clang-format off
 #ifdef UNUSED
 #undef UNUSED
 #endif
@@ -27,11 +28,12 @@ extern "C" {
   {                                                                            \
     char _fag_lineinfo_output_buffer[sizeof(__FILE__) + 16];                   \
     FAG_LINE_INFO(_fag_lineinfo_output_buffer);                                \
-    FAG_DEBUG("Variable %s is unused (at: %s)", #_var,                         \
-              _fag_lineinfo_output_buffer);                                    \
+    FAG_DEBUG(%s, "Variable %s is unused", _fag_lineinfo_output_buffer,       \
+              #_var);                                                          \
     if (&_var) {                                                               \
     }                                                                          \
   }
+// clang-format on
 
 #ifndef NULL
 #define NULL ((void *)0)

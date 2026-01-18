@@ -6,6 +6,8 @@
 
 #include "./typedefs.h"
 
+#include "./BaseObject.hpp"
+
 #include "../dev/allocators.hpp"
 
 #include <iostream>
@@ -15,7 +17,7 @@
 
 namespace fag {
 
-class Entity {
+class Entity : public BaseObject {
 public:
   template <class From, class To>
   static std::shared_ptr<From> promote(From *from) {
@@ -28,7 +30,8 @@ public:
 
     To *retval = nullptr;
 
-    From *FAG_HEAP_CONSTRUCT(To, new_object, ());
+    From *new_object = nullptr;
+    FAG_HEAP_CONSTRUCT(To, new_object, );
     *new_object = *from;
 
     retval = dynamic_cast<To *>(new_object);

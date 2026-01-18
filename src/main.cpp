@@ -1,8 +1,14 @@
 // Copyright (c) Erynn Scholtes
 // SPDX-License-Identifier: MIT
 
+#include "core/Allocator.hpp"
+#include "core/Entity3D.hpp"
 #include "core/Globals.hpp"
+#include "core/Renderer.hpp"
 #include "core/Shader.hpp"
+#include "core/Vulkan/Mesh.hpp"
+#include "core/Vulkan/MeshInstance.hpp"
+#include "core/Vulkan/Renderer.hpp"
 #include "core/Vulkan/Shader.hpp"
 #include "error/IError.hpp"
 #include "fag.hpp"
@@ -15,6 +21,15 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <set>
+#include <vector>
+
+static fag::Vulkan::Renderer *g_vulkan_renderer;
+
+static void *s_custom_allocator(size_t);
+static void s_custom_deleter(void *);
+
+static fag::Allocator custom_alloc{s_custom_allocator, s_custom_deleter};
 
 fag::Scene::LoadResult my_scene_loader(fag::Scene &to_load) {
   UNUSED(to_load);
@@ -28,27 +43,54 @@ fag::Scene::LoadResult my_scene_unloader(fag::Scene &to_load) {
   return fag::Scene::LoadResult::Success;
 }
 
-class MyEntity3D : public fag::Entity3D {
-public:
-  MyEntity3D() { printf("hello !\n"); }
-  ~MyEntity3D() { printf("goodbye !\n"); }
-};
-
 int vulkan_renderer_setup(void) {
-  g_Engine->assign_renderer(new fag::Vulkan::Renderer);
+  g_vulkan_renderer = new fag::Vulkan::Renderer;
+  g_Engine->assign_renderer(g_vulkan_renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
   std::cout << (g_Renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
             << std::endl;
 
-  fag::OS::FileBuffer vertex_shader_default("./shaders/default.vert.spv",
-                                            fag::OS::FileAccessMode::Read);
-  fag::OS::FileBuffer fragment_shader_default("./shaders/default.frag.spv",
-                                              fag::OS::FileAccessMode::Read);
-  fag::Vulkan::Shader vertex_shader(vertex_shader_default,
-                                    fag::ShaderStage::Vertex);
-  fag::Vulkan::Shader fragment_shader(fragment_shader_default,
-                                      fag::ShaderStage::Fragment);
+  // default3d
+  {
+    fag::OS::FileBuffer vertex_shader("./shaders/default.vert.spv",
+                                      fag::OS::FileAccessMode::Read);
+    fag::OS::FileBuffer fragment_shader("./shaders/default.frag.spv",
+                                        fag::OS::FileAccessMode::Read);
+
+    std::vector<fag::Shader *> shaders{};
+    shaders.push_back(
+        new fag::Vulkan::Shader(vertex_shader, fag::ShaderStage::Vertex));
+    shaders.push_back(
+        new fag::Vulkan::Shader(fragment_shader, fag::ShaderStage::Fragment));
+
+    fag::RendercontextCreationInfo info{};
+    info.type = fag::RendercontextCreationInfo::Type::Rendercontext3D;
+    info.shaderArray = shaders.data();
+    info.shaderCount = 2;
+    info.contextDescriptors = std::vector<fag::RendercontextDescriptor>();
+    info.objectDescriptors = std::vector<fag::RendercontextDescriptor>();
+
+    g_Renderer->create_render_context(info);
+  }
+
+  // select the default3D render context
+  g_Renderer->select_render_context(0);
+
+  return EXIT_SUCCESS;
+}
+
+int entities_setup(void) {
+  std::shared_ptr<fag::Mesh> meshptr{new fag::Vulkan::Mesh};
+
+  std::shared_ptr<fag::Entity3D> test_entity{new fag::Entity3D};
+  test_entity->set_mesh(meshptr);
+
+  std::weak_ptr<fag::Entity> my_entities[1];
+
+  std::vector<std::weak_ptr<fag::Entity>> entities;
+  entities.assign(my_entities, my_entities + 1);
+  g_Renderer->set_entities(entities);
 
   return EXIT_SUCCESS;
 }
@@ -57,17 +99,13 @@ int engine_test(int argc, char **argv) {
   UNUSED(argc);
   UNUSED(argv);
 
-  if (EXIT_SUCCESS != vulkan_renderer_setup())
+  g_Engine->set_custom_allocator(custom_alloc);
+
+  bool setup_success = EXIT_SUCCESS == vulkan_renderer_setup() &&
+                       EXIT_SUCCESS == entities_setup();
+
+  if (!setup_success)
     return EXIT_FAILURE;
-
-  fag::Entity3D *ent_3d = new fag::Entity3D;
-
-  std::shared_ptr<fag::Entity3D> my_ent_3d =
-      fag::Entity::promote<fag::Entity3D, MyEntity3D>(ent_3d);
-
-  delete ent_3d;
-
-  std::cout << my_ent_3d.get() << std::endl;
 
   fag::Scene my_scene;
   my_scene.set_loader(my_scene_loader);
@@ -78,6 +116,8 @@ int engine_test(int argc, char **argv) {
   g_Engine->start();
 
   fag::Engine::destroy_singleton();
+
+  delete g_vulkan_renderer;
 
   return EXIT_SUCCESS;
 }
@@ -128,3 +168,6 @@ int main(int argc, char **argv) {
   return engine_test(argc, argv);
   // return file_test(argc, argv);
 }
+
+void *s_custom_allocator(size_t bytes) { return ::malloc(bytes); }
+void s_custom_deleter(void *ptr) { ::free(ptr); }

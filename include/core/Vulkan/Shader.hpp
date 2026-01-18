@@ -20,6 +20,7 @@ class Shader : public fag::Shader {
 
 public:
   Shader(const OS::FileBuffer &shader_file, ShaderStage);
+  Shader(const Shader &);
   ~Shader(void);
 
 private:

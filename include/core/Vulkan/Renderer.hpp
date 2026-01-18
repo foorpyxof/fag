@@ -6,9 +6,10 @@
 
 #include "../Renderer.hpp"
 
+#include "../Entity.hpp"
+#include "./MeshInstance.hpp"
 #include "./Shader.hpp"
-#include "fpxlib3d/include/vk/typedefs.h"
-#include "os/File.hpp"
+#include <memory>
 
 extern "C" {
 #include "../../../modules/fpxlib3d/include/vk.h"
@@ -20,8 +21,6 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
-struct RendercontextCreationInfo;
-
 class Renderer : public fag::Renderer {
 public:
   void render_frame(void);
@@ -29,7 +28,15 @@ public:
   void select_render_context(size_t idx);
   size_t create_render_context(const fag::RendercontextCreationInfo &);
 
-  void set_shapes(const std::vector<fag::Mesh *> &);
+  void set_entities(const std::vector<std::weak_ptr<fag::Entity>> &);
+
+  std::shared_ptr<fag::Mesh>
+      create_mesh(/* specify mesh creation requirements */);
+  std::shared_ptr<fag::MeshInstance>
+  create_meshinstance(fag::MeshInstanceCreationInfo &);
+
+  void destroy_mesh(fag::Mesh &);
+  void destroy_meshinstance(fag::MeshInstance &);
 
 public:
   Renderer(void);
@@ -40,28 +47,25 @@ private:
   void _glfw_setup(void);
   void _gpu_setup(void);
 
-  void _create_default3d_pipeline_layout(void);
-  void _create_default2d_pipeline_layout(void);
+  void _prepare_framebuffers(void);
 
-  void _create_pipeline_layouts(void);
-  void _create_base_pipelines(void);
+  void _teardown(void);
 
 private:
   Fpx3d_Vk_Context m_VulkanContext;
   Fpx3d_Wnd_Context m_WindowContext;
 
-  Fpx3d_Vk_PipelineLayout m_Default2DPipelineLayout;
-  Fpx3d_Vk_PipelineLayout m_Default3DPipelineLayout;
+  Fpx3d_Vk_LogicalGpu *m_LogicalGpuPtr;
 
-  std::vector<Fpx3d_Vk_Pipeline *> m_Pipelines;
-  Fpx3d_Vk_Pipeline *m_SelectedPipeline = nullptr;
-};
+  size_t m_SelectedPipelineIndex = 0;
 
-struct RendercontextCreationInfo : private fag::RendercontextCreationInfo {
-  fag::Vulkan::Shader *shaderArray;
-  size_t shaderCount;
+  struct _pipeline_properties;
+  std::vector<struct _pipeline_properties> m_PipelineProperties;
 
-  Fpx3d_Vk_DescriptorSetBinding balls;
+private:
+  struct _pipeline_properties {
+    fag::RendercontextCreationInfo::Type pipelineType;
+  };
 };
 
 } // namespace Vulkan

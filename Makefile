@@ -33,7 +33,7 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 	-include make/windows/*.mk
 
 	CC := $(CC_WIN32)
-	CXX := $(CCPLUS_WIN32)
+	CXX := $(CXX_WIN32)
 	AR := $(AR_WIN32)
 	CFLAGS += -mwindows
 	CPPFLAGS += -mwindows
@@ -46,7 +46,7 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 	OBJ_EXT := .obj
 	LIB_EXT := .lib
 
-	undefine LIB_PFX_OPT
+	LIB_PFX_OPT =
 
 else
 
@@ -135,14 +135,14 @@ $(RELEASE_APP): $(MAIN_CPP) $(FINAL_LIB_RELEASE)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
 	$(CXX) $(CPPFLAGS) $< \
-	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
+	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-l:"$(notdir $(lib))") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(RELEASE_FLAGS) -o $@
 
 $(DEBUG_APP): $(MAIN_CPP) $(FINAL_LIB_DEBUG)
 	@echo target: $(TARGET)
 	if [[ "$(TARGET)" == "$(WINDOWS_TARGET_NAME)" ]]; then $(MAKE) $(REQUIRED_DLLS); fi
 	$(CXX) $(CPPFLAGS) $< \
-	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-Wl,"$(lib)") $(LDFLAGS) \
+	-L$(LIBRARY_FOLDER) $(foreach lib,$(filter-out $<,$^),-l:"$(notdir $(lib))") $(LDFLAGS) \
 	$(EXTRA_FLAGS) $(DEBUG_FLAGS) -o $@
 
 include make/zip.mak

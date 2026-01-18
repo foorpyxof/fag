@@ -14,8 +14,13 @@ namespace fag {
 namespace Vulkan {
 
 class Mesh : public fag::Mesh {
+  friend class Renderer;
+
 public:
   std::shared_ptr<fag::Mesh> clone(void);
+
+public:
+  const Fpx3d_Vk_ShapeBuffer &get_vulkan_shapebuffer(void) const;
 
 private:
   Fpx3d_Vk_ShapeBuffer m_VulkanShapeBuffer;

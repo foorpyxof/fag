@@ -3,6 +3,7 @@
 
 #include "debug.h"
 #include "error/Generic.hpp"
+#include "error/Internal.hpp"
 #include "os/File.hpp"
 
 #include "macros.hpp"
@@ -12,6 +13,7 @@ extern "C" {
 #include "fpxlib3d/include/vk/typedefs.h"
 }
 
+#include <cstring>
 #include <sstream>
 
 extern "C" {
@@ -57,10 +59,24 @@ Shader::Shader(const OS::FileBuffer &shader_file, ShaderStage stage) {
   if (0 == m_SpirvData.filesize)
     throw fag::Error::Generic("an error occured while loading Vulkan shader");
 
-  FAG_DEBUG("Shader at '%s' loaded successfully",
+  FAG_DEBUG(fag::Vulkan::Shader, "Shader at '%s' loaded successfully",
             shader_file.get_file_path().c_str());
 
   m_ShaderStage = stage;
+}
+Shader::Shader(const Shader &other)
+    : m_ShaderStage(other.m_ShaderStage), m_SpirvData(other.m_SpirvData) {
+  // deep copy of SPIR-V data
+  m_SpirvData = fpx3d_vk_read_spirv_data(
+      m_SpirvData.buffer, m_SpirvData.filesize, m_SpirvData.stage);
+
+  if (nullptr == m_SpirvData.buffer) {
+    FAG_ERROR(fag::Vulkan::Shader, "failed to deep-copy SPIR-V module");
+
+    std::ostringstream errmsg;
+    errmsg << "error while trying to copy a shader.";
+    throw fag::Error::Internal(errmsg.str().c_str(), __FILE__, __LINE__);
+  }
 }
 Shader::~Shader(void) { fpx3d_vk_destroy_spirv_file(&m_SpirvData); }
 

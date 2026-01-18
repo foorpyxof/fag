@@ -5,7 +5,7 @@
 #define FAG_CORE_ENGINE_HPP
 
 #include "./Allocator.hpp"
-#include "./Renderer.hpp"
+#include "./BaseObject.hpp"
 #include "./SceneManager.hpp"
 
 #include <cstddef>
@@ -14,8 +14,9 @@ namespace fag {
 
 class SceneManager;
 class Scene;
+class Renderer;
 
-class Engine {
+class Engine : public BaseObject {
 public:
   static Engine *get_singleton(void);
   static void destroy_singleton(void);

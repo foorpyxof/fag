@@ -29,7 +29,7 @@ Allocator Engine::s_CustomAllocator = {};
 
 Engine *Engine::get_singleton(void) {
   if (nullptr == Engine::s_Singleton) {
-    FAG_HEAP_CONSTRUCT(Engine, Engine::s_Singleton, ());
+    Engine::s_Singleton = new Engine;
   }
 
   return Engine::s_Singleton;
@@ -86,14 +86,17 @@ int Engine::start(void) {
 
   m_Running = true;
 
-  // FAG_DEBUG("Entering engine loop!");
+  FAG_DEBUG(fag::Engine, "Entering engine loop!");
   // while (!m_ShouldStop) {
-  //   /*
-  //    * Engine loop code goes here!
-  //    */
-  // }
+  /*
+   * Engine loop code goes here!
+   */
 
-  _teardown();
+  // process all entities
+
+  // render the frame once we're done
+  m_Renderer->render_frame();
+  // }
 
   return 0;
 }
@@ -101,12 +104,16 @@ int Engine::start(void) {
 void Engine::raise_stop_condition(void) { m_ShouldStop = true; }
 void Engine::stop(void) { _teardown(); }
 
-IMPLEMENT_THIS(void Engine::_teardown(void), m_Running = false;
-               FAG_DEBUG("Destroying F.A.G. engine");)
+void Engine::_teardown(void) {
+  m_Running = false;
+  FAG_DEBUG(fag::Engine, "Destroying F.A.G. engine");
+
+  delete m_SceneManager;
+}
 
 Engine::Engine() : m_Running(false), m_ShouldStop(false), m_Renderer(nullptr) {
-  FAG_HEAP_CONSTRUCT(SceneManager, m_SceneManager, ());
+  m_SceneManager = new SceneManager;
 }
-Engine::~Engine(void) {}
+Engine::~Engine(void) { _teardown(); }
 
 } // namespace fag
