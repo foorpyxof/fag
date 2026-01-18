@@ -13,8 +13,8 @@ namespace fag {
 
 class Entity3D : public Entity, public Drawable {
 public:
-  virtual void update(void);
-  virtual void fixed_update(void);
+  virtual void update(void) override;
+  virtual void fixed_update(void) override;
 
 public:
   const Transform3D &get_transform(void) const;

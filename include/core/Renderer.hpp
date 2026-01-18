@@ -35,6 +35,7 @@ struct ModelMatrices3D;
 
 class Renderer : public BaseObject {
 public:
+  virtual bool window_has_closed(void) = 0;
   virtual void render_frame(void) = 0;
 
   // Render contexts:

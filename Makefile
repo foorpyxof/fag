@@ -50,6 +50,9 @@ ifeq ($(TARGET),$(WINDOWS_TARGET_NAME))
 
 else
 
+DEBUG_FLAGS += -fsanitize=address
+# ^^^ uncomment for ASAN
+
 ifeq ($(CC),)
 	CC != which cc
 endif

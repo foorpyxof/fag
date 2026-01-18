@@ -87,16 +87,16 @@ int Engine::start(void) {
   m_Running = true;
 
   FAG_DEBUG(fag::Engine, "Entering engine loop!");
-  // while (!m_ShouldStop) {
-  /*
-   * Engine loop code goes here!
-   */
+  while (!m_ShouldStop && !(m_Renderer->window_has_closed())) {
+    /*
+     * Engine loop code goes here!
+     */
 
-  // process all entities
+    // process all entities
 
-  // render the frame once we're done
-  m_Renderer->render_frame();
-  // }
+    // render the frame once we're done
+    m_Renderer->render_frame();
+  }
 
   return 0;
 }

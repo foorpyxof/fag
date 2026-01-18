@@ -23,20 +23,21 @@ namespace Vulkan {
 
 class Renderer : public fag::Renderer {
 public:
-  void render_frame(void);
+  bool window_has_closed(void) override;
+  void render_frame(void) override;
 
-  void select_render_context(size_t idx);
-  size_t create_render_context(const fag::RendercontextCreationInfo &);
+  void select_render_context(size_t idx) override;
+  size_t create_render_context(const fag::RendercontextCreationInfo &) override;
 
-  void set_entities(const std::vector<std::weak_ptr<fag::Entity>> &);
+  void set_entities(const std::vector<std::weak_ptr<fag::Entity>> &) override;
 
   std::shared_ptr<fag::Mesh>
-      create_mesh(/* specify mesh creation requirements */);
+      create_mesh(/* specify mesh creation requirements */) override;
   std::shared_ptr<fag::MeshInstance>
-  create_meshinstance(fag::MeshInstanceCreationInfo &);
+  create_meshinstance(fag::MeshInstanceCreationInfo &) override;
 
-  void destroy_mesh(fag::Mesh &);
-  void destroy_meshinstance(fag::MeshInstance &);
+  void destroy_mesh(fag::Mesh &) override;
+  void destroy_meshinstance(fag::MeshInstance &) override;
 
 public:
   Renderer(void);

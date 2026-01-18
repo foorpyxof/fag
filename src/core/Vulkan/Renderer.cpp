@@ -92,7 +92,15 @@ Renderer::~Renderer(void) {
   FAG_TODO("properly destroy Vulkan::Renderer in the destructor");
 }
 
+bool Renderer::window_has_closed(void) {
+  return (m_WindowContext.pointer == nullptr) ||
+         glfwWindowShouldClose(
+             static_cast<GLFWwindow *>(m_WindowContext.pointer));
+}
+
 void Renderer::render_frame(void) {
+  glfwPollEvents();
+
   if (nullptr == m_LogicalGpuPtr) {
     FAG_ERROR(fag::Vulkan::Renderer, "m_LogicalGpuPtr is NULL");
     throw fag::Error::Internal("the Vulkan renderer encountered an error while "
@@ -128,6 +136,7 @@ void Renderer::select_render_context(size_t idx) {
 
   m_SelectedPipelineIndex = real_index;
 }
+
 size_t Renderer::create_render_context(
     const fag::RendercontextCreationInfo &creation_info) {
   std::vector<Fpx3d_Vk_DescriptorSetBinding> pipeline_bindings(
@@ -168,8 +177,6 @@ size_t Renderer::create_render_context(
 
   Fpx3d_Vk_PipelineLayout pl =
       fpx3d_vk_create_pipeline_layout(ds_layouts, 2, m_LogicalGpuPtr);
-  fpx3d_vk_destroy_descriptor_set_layout(&ds_layouts[0], m_LogicalGpuPtr);
-  fpx3d_vk_destroy_descriptor_set_layout(&ds_layouts[1], m_LogicalGpuPtr);
 
   Fpx3d_Vk_SpirvFile *spirvs =
       new Fpx3d_Vk_SpirvFile[creation_info.shaderCount]{};
@@ -226,9 +233,20 @@ size_t Renderer::create_render_context(
     // what
     FAG_ERROR(fag::Vulkan::Renderer,
               "invalid value for Vulkan Pipeline type (2D or 3D)")
+    fpx3d_vk_destroy_pipeline_layout(&pl, m_LogicalGpuPtr);
+    fpx3d_vk_destroy_descriptor_set_layout(&ds_layouts[0], m_LogicalGpuPtr);
+    fpx3d_vk_destroy_descriptor_set_layout(&ds_layouts[1], m_LogicalGpuPtr);
+    fpx3d_vk_destroy_shadermodules(&shaders, m_LogicalGpuPtr);
     throw fag::Error::Generic(
         "invalid value passed for Vulkan Rendercontext type");
   }
+
+  Fpx3d_Vk_Pipeline *p = fpx3d_vk_get_pipeline_at(
+      m_LogicalGpuPtr, m_LogicalGpuPtr->pipelineCapacity - 1);
+
+  fpx3d_vk_create_pipeline_descriptors(p, pipeline_bindings.data(),
+                                       pipeline_bindings.size(),
+                                       &m_VulkanContext, m_LogicalGpuPtr);
 
   struct _pipeline_properties new_pipeline_props{};
   new_pipeline_props.pipelineType = creation_info.type;

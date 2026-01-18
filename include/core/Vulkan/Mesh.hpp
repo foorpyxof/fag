@@ -17,7 +17,7 @@ class Mesh : public fag::Mesh {
   friend class Renderer;
 
 public:
-  std::shared_ptr<fag::Mesh> clone(void);
+  std::shared_ptr<fag::Mesh> clone(void) override;
 
 public:
   const Fpx3d_Vk_ShapeBuffer &get_vulkan_shapebuffer(void) const;

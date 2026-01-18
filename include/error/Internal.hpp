@@ -13,7 +13,7 @@ namespace Error {
 
 class Internal : public IError {
 public:
-  const char *what() const noexcept;
+  const char *what() const noexcept override;
 
 public:
   Internal(const char *message, const char *filename, int line_number);

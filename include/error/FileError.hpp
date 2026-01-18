@@ -10,7 +10,7 @@ namespace Error {
 
 class FileError : public IError {
 public:
-  const char *what() const noexcept;
+  const char *what() const noexcept override;
 
 public:
   FileError(const char *message);
