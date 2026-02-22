@@ -6,10 +6,13 @@
 #include "core/Globals.hpp"
 #include "core/Renderer.hpp"
 #include "core/Shader.hpp"
+#include "core/Vulkan/GlfwWindow.hpp"
 #include "core/Vulkan/Mesh.hpp"
 #include "core/Vulkan/MeshInstance.hpp"
 #include "core/Vulkan/Renderer.hpp"
 #include "core/Vulkan/Shader.hpp"
+#include "core/Vulkan/Window.hpp"
+#include "error/Fatal.hpp"
 #include "error/IError.hpp"
 #include "fag.hpp"
 
@@ -25,6 +28,7 @@
 #include <vector>
 
 static fag::Vulkan::Renderer *g_vulkan_renderer;
+static std::shared_ptr<fag::Window> g_main_window;
 
 static void *s_custom_allocator(size_t);
 static void s_custom_deleter(void *);
@@ -44,25 +48,32 @@ fag::Scene::LoadResult my_scene_unloader(fag::Scene &to_load) {
 }
 
 int vulkan_renderer_setup(void) {
-  g_vulkan_renderer = new fag::Vulkan::Renderer;
+  g_main_window = std::make_shared<fag::Vulkan::GlfwWindow>();
+  g_vulkan_renderer = new fag::Vulkan::Renderer(
+      std::dynamic_pointer_cast<fag::Vulkan::Window>(g_main_window));
+  // g_vulkan_renderer->use_window(g_main_window);
+
   g_Engine->assign_renderer(g_vulkan_renderer);
 
   std::cout << "Renderer is VulkanRenderer? ";
   std::cout << (g_Renderer->is<fag::Vulkan::Renderer>() ? "yes" : "no")
             << std::endl;
 
-  // default3d
+  // 3d render context
   {
-    fag::OS::FileBuffer vertex_shader("./shaders/default.vert.spv",
-                                      fag::OS::FileAccessMode::Read);
-    fag::OS::FileBuffer fragment_shader("./shaders/default.frag.spv",
-                                        fag::OS::FileAccessMode::Read);
+    fag::OS::FileBuffer vertex_shader_file("./shaders/default.vert.spv",
+                                           fag::OS::FileAccessMode::Read);
+    fag::OS::FileBuffer fragment_shader_file("./shaders/default.frag.spv",
+                                             fag::OS::FileAccessMode::Read);
+
+    std::shared_ptr<fag::Shader> vertex_shader =
+        g_Renderer->create_shader(vertex_shader_file, fag::ShaderStage::Vertex);
+    std::shared_ptr<fag::Shader> fragment_shader = g_Renderer->create_shader(
+        fragment_shader_file, fag::ShaderStage::Fragment);
 
     std::vector<fag::Shader *> shaders{};
-    shaders.push_back(
-        new fag::Vulkan::Shader(vertex_shader, fag::ShaderStage::Vertex));
-    shaders.push_back(
-        new fag::Vulkan::Shader(fragment_shader, fag::ShaderStage::Fragment));
+    shaders.push_back(vertex_shader.get());
+    shaders.push_back(fragment_shader.get());
 
     fag::RendercontextCreationInfo info{};
     info.type = fag::RendercontextCreationInfo::Type::Rendercontext3D;
@@ -74,14 +85,15 @@ int vulkan_renderer_setup(void) {
     g_Renderer->create_render_context(info);
   }
 
-  // select the default3D render context
+  // select the 3D render context
   g_Renderer->select_render_context(0);
 
   return EXIT_SUCCESS;
 }
 
 int entities_setup(void) {
-  std::shared_ptr<fag::Mesh> meshptr{new fag::Vulkan::Mesh};
+  fag::MeshCreationInfo mesh_info{};
+  std::shared_ptr<fag::Mesh> meshptr = g_Renderer->create_mesh(mesh_info);
 
   std::shared_ptr<fag::Entity3D> test_entity{new fag::Entity3D};
   test_entity->set_mesh(meshptr);
@@ -118,6 +130,25 @@ int engine_test(int argc, char **argv) {
   fag::Engine::destroy_singleton();
 
   delete g_vulkan_renderer;
+
+  return EXIT_SUCCESS;
+}
+
+int window_test(int argc, char **argv) {
+  UNUSED(argc);
+  UNUSED(argv);
+
+  g_main_window = std::make_shared<fag::Vulkan::GlfwWindow>(400, 400);
+
+  g_main_window->set_window_title("F.A.G. Window test");
+  std::cout << "Window title:\t\t" << g_main_window->get_window_title()
+            << std::endl;
+  std::cout << "Width:\t\t\t" << g_main_window->get_dimensions().width
+            << "\nHeight:\t\t\t" << g_main_window->get_dimensions().height
+            << std::endl;
+  std::cout << "Has window closed:\t" << g_main_window->has_closed()
+            << std::endl;
+  g_main_window->poll_events();
 
   return EXIT_SUCCESS;
 }
@@ -165,8 +196,15 @@ int file_test(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-  return engine_test(argc, argv);
-  // return file_test(argc, argv);
+  try {
+    return engine_test(argc, argv);
+    // return window_test(argc, argv);
+    // return file_test(argc, argv);
+  } catch (const fag::Error::IError &err) {
+    std::cout << err.what() << std::endl;
+  } catch (const fag::Error::Fatal &err) {
+    std::cout << err.what() << std::endl;
+  }
 }
 
 void *s_custom_allocator(size_t bytes) { return ::malloc(bytes); }

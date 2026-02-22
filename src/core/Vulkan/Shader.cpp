@@ -25,8 +25,25 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
+Shader::Shader(const Shader &other)
+    : m_ShaderStage(other.m_ShaderStage), m_SpirvData(other.m_SpirvData) {
+  // deep copy of SPIR-V data
+  m_SpirvData = fpx3d_vk_read_spirv_data(
+      m_SpirvData.buffer, m_SpirvData.filesize, m_SpirvData.stage);
+
+  if (nullptr == m_SpirvData.buffer) {
+    FAG_ERROR(fag::Vulkan::Shader,
+              "failed to deep-copy fpxlib3d SPIR-V module");
+
+    std::ostringstream errmsg;
+    errmsg << "error while trying to copy a shader.";
+    throw fag::Error::Internal(errmsg.str().c_str(), __FILE__, __LINE__);
+  }
+}
 Shader::Shader(const OS::FileBuffer &shader_file, ShaderStage stage) {
   Fpx3d_Vk_E_ShaderStage shaderstage_converted = SHADER_STAGE_INVALID;
+
+  FAG_TODO("make Vulkan shader only constructible using Vulkan::Renderer");
 
   // turn the 'fag::ShaderStage' value into
   // a value that's valid for Fpx3d_Vk
@@ -64,20 +81,7 @@ Shader::Shader(const OS::FileBuffer &shader_file, ShaderStage stage) {
 
   m_ShaderStage = stage;
 }
-Shader::Shader(const Shader &other)
-    : m_ShaderStage(other.m_ShaderStage), m_SpirvData(other.m_SpirvData) {
-  // deep copy of SPIR-V data
-  m_SpirvData = fpx3d_vk_read_spirv_data(
-      m_SpirvData.buffer, m_SpirvData.filesize, m_SpirvData.stage);
 
-  if (nullptr == m_SpirvData.buffer) {
-    FAG_ERROR(fag::Vulkan::Shader, "failed to deep-copy SPIR-V module");
-
-    std::ostringstream errmsg;
-    errmsg << "error while trying to copy a shader.";
-    throw fag::Error::Internal(errmsg.str().c_str(), __FILE__, __LINE__);
-  }
-}
 Shader::~Shader(void) { fpx3d_vk_destroy_spirv_file(&m_SpirvData); }
 
 } // namespace Vulkan

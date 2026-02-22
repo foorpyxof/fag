@@ -20,7 +20,7 @@ INCLUDE_FLAGS := $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 
 # comp/link flags
 CFLAGS += $(INCLUDE_FLAGS)
-CPPFLAGS += $(INCLUDE_FLAGS)
+CPPFLAGS += $(INCLUDE_FLAGS) -Wsuggest-override
 
 LDFLAGS += $(foreach dir,$(LIB_DIRS),-L$(dir))
 

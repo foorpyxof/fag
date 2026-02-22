@@ -19,9 +19,11 @@ class Shader : public fag::Shader {
   friend class Renderer;
 
 public:
-  Shader(const OS::FileBuffer &shader_file, ShaderStage);
   Shader(const Shader &);
   ~Shader(void);
+
+private:
+  Shader(const OS::FileBuffer &shader_file, ShaderStage);
 
 private:
   ShaderStage m_ShaderStage;

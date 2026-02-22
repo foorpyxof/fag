@@ -4,6 +4,7 @@
 #include "core/Renderer.hpp"
 #include "core/SceneManager.hpp"
 #include "core/Vulkan/Renderer.hpp"
+#include "core/Window.hpp"
 
 #include "error/Generic.hpp"
 
@@ -87,7 +88,13 @@ int Engine::start(void) {
   m_Running = true;
 
   FAG_DEBUG(fag::Engine, "Entering engine loop!");
-  while (!m_ShouldStop && !(m_Renderer->window_has_closed())) {
+
+  std::shared_ptr<fag::Window> main_window =
+      m_Renderer->get_main_window().lock();
+
+  while (!m_ShouldStop && (main_window && !main_window->has_closed())) {
+    main_window->poll_events();
+
     /*
      * Engine loop code goes here!
      */
@@ -96,6 +103,10 @@ int Engine::start(void) {
 
     // render the frame once we're done
     m_Renderer->render_frame();
+
+    // re-grab the main window, in case it's changed
+    main_window.reset();
+    main_window = m_Renderer->get_main_window().lock();
   }
 
   return 0;

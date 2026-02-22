@@ -9,6 +9,8 @@
 #include "../Entity.hpp"
 #include "./MeshInstance.hpp"
 #include "./Shader.hpp"
+#include "core/Shader.hpp"
+#include "os/File.hpp"
 #include <memory>
 
 extern "C" {
@@ -21,9 +23,13 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
+class Window;
+
 class Renderer : public fag::Renderer {
 public:
-  bool window_has_closed(void) override;
+  void setup_window(const std::weak_ptr<fag::Window> &) const override;
+  void use_window(const std::weak_ptr<fag::Window> &) override;
+
   void render_frame(void) override;
 
   void select_render_context(size_t idx) override;
@@ -32,22 +38,27 @@ public:
   void set_entities(const std::vector<std::weak_ptr<fag::Entity>> &) override;
 
   std::shared_ptr<fag::Mesh>
-      create_mesh(/* specify mesh creation requirements */) override;
+  create_mesh(const fag::MeshCreationInfo &) override;
   std::shared_ptr<fag::MeshInstance>
-  create_meshinstance(fag::MeshInstanceCreationInfo &) override;
+  create_meshinstance(const fag::MeshInstanceCreationInfo &) override;
+  std::shared_ptr<fag::Shader>
+  create_shader(const fag::OS::FileBuffer &shader_file,
+                fag::ShaderStage stage) override;
 
   void destroy_mesh(fag::Mesh &) override;
   void destroy_meshinstance(fag::MeshInstance &) override;
+  void destroy_shader(fag::Shader &) override;
 
 public:
-  Renderer(void);
+  Renderer(const std::weak_ptr<fag::Vulkan::Window> &);
   ~Renderer(void);
 
 private:
-  void _vulkan_setup(void);
+  void _vulkan_setup(const std::shared_ptr<fag::Vulkan::Window> &);
   void _glfw_setup(void);
   void _gpu_setup(void);
 
+  void _prepare_command_buffers(void);
   void _prepare_framebuffers(void);
 
   void _teardown(void);

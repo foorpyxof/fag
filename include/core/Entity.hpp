@@ -32,7 +32,9 @@ public:
 
     From *new_object = nullptr;
     FAG_HEAP_CONSTRUCT(To, new_object, );
-    *new_object = *from;
+    if (!new_object)
+
+      *new_object = *from;
 
     retval = dynamic_cast<To *>(new_object);
     if (nullptr == retval) {

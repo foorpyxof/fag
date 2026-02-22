@@ -7,20 +7,26 @@
 #include "core/Entity3D.hpp"
 #include "core/Mesh.hpp"
 #include "core/MeshInstance.hpp"
+#include "core/Shader.hpp"
 #include "core/Transforms.hpp"
 #include "core/Vertex.hpp"
+#include "core/Vulkan/GlfwWindow.hpp"
 #include "core/Vulkan/Mesh.hpp"
 #include "core/Vulkan/MeshInstance.hpp"
 #include "core/Vulkan/Shader.hpp"
+#include "core/Vulkan/Window.hpp"
+#include "core/Window.hpp"
 #include "debug.h"
 #include "dev/allocators.hpp"
 #include "dev/smartptrs.hpp"
+#include "error/Fatal.hpp"
 #include "error/Generic.hpp"
 #include "error/Internal.hpp"
 
 #include "macros.hpp"
 
 #include "core/Vulkan/Renderer.hpp"
+#include "os/File.hpp"
 
 extern "C" {
 #include "fpxlib3d/include/vk/descriptors.h"
@@ -29,12 +35,13 @@ extern "C" {
 #include "fpxlib3d/include/vk/renderpass.h"
 #include "fpxlib3d/include/vk/shaders.h"
 #include "fpxlib3d/include/vk/shape.h"
+#include "fpxlib3d/include/vk/swapchain.h"
 #include "fpxlib3d/include/vk/typedefs.h"
 #include "fpxlib3d/include/vk/utility.h"
 #include "fpxlib3d/include/vk/vertex.h"
+#include "fpxlib3d/include/window/window.h"
 }
 
-#include "glfw/include/GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
 
 #include <memory>
@@ -51,7 +58,7 @@ static const char *s_VulkanGpuExtensions[1] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 static VkPhysicalDeviceFeatures s_DeviceFeatures{};
 
 static int s_gpu_scoring_function(Fpx3d_Vk_Context *, Fpx3d_Vk_PhysicalDevice);
-static struct fpx3d_wnd_dimensions s_window_resize_callback(void *window_ptr);
+static struct fpx3d_wnd_dimensions s_window_size_callback(void *window_ptr);
 
 static void
 s_create_binding_list(std::vector<Fpx3d_Vk_DescriptorSetBinding> &,
@@ -64,7 +71,8 @@ namespace Vulkan {
 #define INIT_WINDOW_WIDTH 500
 #define INIT_WINDOW_HEIGHT 500
 
-Renderer::Renderer(void) : m_VulkanContext({}), m_LogicalGpuPtr(nullptr) {
+Renderer::Renderer(const std::weak_ptr<fag::Vulkan::Window> &winptr)
+    : m_VulkanContext({}), m_LogicalGpuPtr(nullptr) {
   if (!s_VulkanSettingsInitialized) {
     fpx3d_vk_set_required_presentmodes(&s_SwapchainRequirements,
                                        s_VulkanPresentModes,
@@ -79,27 +87,73 @@ Renderer::Renderer(void) : m_VulkanContext({}), m_LogicalGpuPtr(nullptr) {
     s_VulkanSettingsInitialized = true;
   }
 
-  glfwInit();
+  this->use_window(winptr);
+  this->_set_selected_window(winptr);
 
-  _vulkan_setup();
-  _glfw_setup();
+  if (auto shrptr = winptr.lock()) {
+    _vulkan_setup(shrptr);
+    this->set_main_window(winptr);
+  } else {
+    throw fag::Error::Fatal("Vulkan renderer could not take ownership of the "
+                            "passed Vulkan window. aborting",
+                            __FILE__, __LINE__);
+  }
+
   _gpu_setup();
+  _prepare_command_buffers();
   _prepare_framebuffers();
 }
 Renderer::~Renderer(void) {
-  glfwDestroyWindow(static_cast<GLFWwindow *>(m_WindowContext.pointer));
-  glfwTerminate();
   FAG_TODO("properly destroy Vulkan::Renderer in the destructor");
 }
 
-bool Renderer::window_has_closed(void) {
-  return (m_WindowContext.pointer == nullptr) ||
-         glfwWindowShouldClose(
-             static_cast<GLFWwindow *>(m_WindowContext.pointer));
+void Renderer::setup_window(const std::weak_ptr<fag::Window> &winptr) const {
+  if (std::shared_ptr<fag::Vulkan::Window> shrptr =
+          std::dynamic_pointer_cast<fag::Vulkan::Window>(winptr.lock()))
+    shrptr->create_vulkan_surface(m_VulkanContext.vkInstance);
+  else
+    throw fag::Error::Generic(
+        "Vulkan renderer could not setup the given window for rendering");
+}
+
+void Renderer::use_window(const std::weak_ptr<fag::Window> &winptr) {
+  if (std::shared_ptr<fag::Vulkan::Window> shrptr =
+          std::dynamic_pointer_cast<fag::Vulkan::Window>(winptr.lock())) {
+
+    /*
+    if (!m_VulkanContext.vkSurface) {
+      // if we didn't have a surface yet, this is the first assigned window.
+      // therefore, it must be the main window
+      try {
+        this->set_main_window(shrptr);
+      } catch (const fag::Error::IError &setter_error) {
+      }
+    }
+    */
+
+    m_VulkanContext.vkSurface = shrptr->get_vulkan_surface();
+    fpx3d_vk_refresh_current_swapchain(&m_VulkanContext, m_LogicalGpuPtr);
+
+    m_WindowContext.pointer = shrptr.get();
+    fpx3d_wnd_set_window_pointer(&m_WindowContext, m_WindowContext.pointer);
+  } else {
+    throw fag::Error::Generic("Vulkan renderer could not select the given "
+                              "window to use for rendering");
+  }
 }
 
 void Renderer::render_frame(void) {
-  glfwPollEvents();
+  std::shared_ptr<fag::Window> main_win_ptr = get_main_window().lock();
+  std::shared_ptr<fag::Window> sel_win_ptr = get_selected_window().lock();
+
+  if (!sel_win_ptr && !main_win_ptr) {
+    throw fag::Error::Fatal(
+        "Vulkan renderer doesn't have a valid window to render to", __FILE__,
+        __LINE__);
+  } else if (!sel_win_ptr) {
+    _set_selected_window(main_win_ptr);
+    sel_win_ptr = main_win_ptr;
+  }
 
   if (nullptr == m_LogicalGpuPtr) {
     FAG_ERROR(fag::Vulkan::Renderer, "m_LogicalGpuPtr is NULL");
@@ -296,23 +350,42 @@ void Renderer::set_entities(
   }
 }
 
-IMPLEMENT_THIS(std::shared_ptr<fag::Mesh> Renderer::create_mesh(),
-               return nullptr;);
+std::shared_ptr<fag::Mesh>
+Renderer::create_mesh(const fag::MeshCreationInfo &create_info) {
+  UNUSED(create_info);
 
-std::shared_ptr<fag::MeshInstance>
-Renderer::create_meshinstance(fag::MeshInstanceCreationInfo &create_info) {
+  fag::Vulkan::Mesh *m_to_return = nullptr;
+
+  Fpx3d_Vk_VertexBundle vb{};
+  fpx3d_vk_allocate_vertices(&vb, create_info.vertexCount, create_info.stride);
+  fpx3d_vk_append_vertices(&vb, create_info.vertexData,
+                           create_info.vertexCount);
+
+  if (create_info.indices && create_info.indexCount)
+    fpx3d_vk_set_indices(&vb, create_info.indices, create_info.indexCount);
+
+  Fpx3d_Vk_ShapeBuffer sb{};
+  fpx3d_vk_create_shapebuffer(&m_VulkanContext, m_LogicalGpuPtr, &vb, &sb);
+
+  FAG_HEAP_CONSTRUCT(fag::Vulkan::Mesh, m_to_return, (sb));
+
+  return fag::_dev::create_shared_ptr(m_to_return);
+}
+
+std::shared_ptr<fag::MeshInstance> Renderer::create_meshinstance(
+    const fag::MeshInstanceCreationInfo &create_info) {
   fag::Vulkan::MeshInstance *mi_to_return = nullptr;
 
   if (std::shared_ptr<const fag::Mesh> mesh_ptr =
           create_info.meshPointer.lock()) {
-    const fag::Vulkan::Mesh *raw_ptr =
-        dynamic_cast<const fag::Vulkan::Mesh *>(mesh_ptr.get());
+    std::shared_ptr<const fag::Vulkan::Mesh> vk_mesh_ptr =
+        std::dynamic_pointer_cast<const fag::Vulkan::Mesh>(mesh_ptr);
 
-    if (nullptr == raw_ptr)
+    if (!vk_mesh_ptr)
       throw fag::Error::Generic("Vulkan renderer was given a non-Vulkan mesh",
                                 __FILE__, __LINE__);
 
-    FAG_HEAP_CONSTRUCT(fag::Vulkan::MeshInstance, mi_to_return, (mesh_ptr));
+    FAG_HEAP_CONSTRUCT(fag::Vulkan::MeshInstance, mi_to_return, (vk_mesh_ptr));
 
     if (!mi_to_return->m_VulkanShape.isValid)
       throw fag::Error::Generic(
@@ -323,6 +396,15 @@ Renderer::create_meshinstance(fag::MeshInstanceCreationInfo &create_info) {
                                __FILE__, __LINE__);
 
   return fag::_dev::create_shared_ptr(mi_to_return);
+}
+
+std::shared_ptr<fag::Shader>
+Renderer::create_shader(const fag::OS::FileBuffer &shader_file,
+                        fag::ShaderStage stage) {
+  fag::Shader *ret_shader = nullptr;
+  FAG_HEAP_CONSTRUCT(fag::Vulkan::Shader, ret_shader, (shader_file, stage));
+
+  return fag::_dev::create_shared_ptr(ret_shader);
 }
 
 void Renderer::destroy_mesh(fag::Mesh &mesh_ref) {
@@ -337,7 +419,14 @@ void Renderer::destroy_meshinstance(fag::MeshInstance &meshinstance_ref) {
   meshinstance_ref.invalidate();
 }
 
-void Renderer::_vulkan_setup(void) {
+void Renderer::destroy_shader(fag::Shader &shader_ref) {
+  UNUSED(shader_ref);
+  FAG_TODO("implement fag::Vulkan::Renderer::destroy_shader()");
+  shader_ref.invalidate();
+}
+
+void Renderer::_vulkan_setup(
+    const std::shared_ptr<fag::Vulkan::Window> &winptr) {
   {
     VkApplicationInfo app_info{};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -351,44 +440,30 @@ void Renderer::_vulkan_setup(void) {
     m_VulkanContext.lgpuExtensions = s_VulkanGpuExtensions;
     m_VulkanContext.lgpuExtensionCount = ARRAY_SIZE(s_VulkanGpuExtensions);
 
-    uint32_t glfw_extension_count = 0;
-    m_VulkanContext.instanceExtensions =
-        glfwGetRequiredInstanceExtensions(&glfw_extension_count);
-    m_VulkanContext.instanceExtensionCount = glfw_extension_count;
+    m_VulkanContext.instanceExtensionCount = 0;
+
+    if (winptr->is<fag::Vulkan::GlfwWindow>()) {
+      uint32_t glfw_extension_count = 0;
+      m_VulkanContext.instanceExtensions =
+          glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+      m_VulkanContext.instanceExtensionCount = glfw_extension_count;
+    }
 
     fpx3d_vk_set_custom_pointer(&m_VulkanContext, this);
   }
 
-  m_WindowContext.sizeCallback = s_window_resize_callback;
+  fpx3d_wnd_set_window_pointer(&m_WindowContext, winptr.get());
+
+  m_WindowContext.sizeCallback = s_window_size_callback;
   fpx3d_vk_init_context(&m_VulkanContext, &m_WindowContext);
 
   // double buffering
   m_VulkanContext.constants.maxFramesInFlight = 2;
 
   fpx3d_vk_create_instance(&m_VulkanContext);
-}
 
-void Renderer::_glfw_setup(void) {
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-  GLFWwindow *win = nullptr;
-
-  win = glfwCreateWindow(INIT_WINDOW_WIDTH, INIT_WINDOW_HEIGHT,
-                         "F.A.G. Game Window", nullptr, nullptr);
-
-  if (nullptr == win) {
-    throw std::runtime_error("Could not create game window");
-  }
-
-  VkResult surface_result = glfwCreateWindowSurface(
-      m_VulkanContext.vkInstance, win, nullptr, &m_VulkanContext.vkSurface);
-
-  if (VK_SUCCESS > surface_result) {
-    throw std::runtime_error("Could not create Vulkan instance");
-  }
-
-  fpx3d_wnd_set_window_pointer(&m_WindowContext, win);
+  winptr->create_vulkan_surface(m_VulkanContext.vkInstance);
+  use_window(winptr);
 }
 
 void Renderer::_gpu_setup(void) {
@@ -403,13 +478,15 @@ void Renderer::_gpu_setup(void) {
     throw std::runtime_error("Failed to initialize Vulkan GPU");
 }
 
-void Renderer::_prepare_framebuffers(void) {
+void Renderer::_prepare_command_buffers(void) {
   fpx3d_vk_allocate_commandpools(m_LogicalGpuPtr, 2);
   fpx3d_vk_create_commandpool_at(m_LogicalGpuPtr, 0, TRANSFER_POOL);
   fpx3d_vk_create_commandpool_at(m_LogicalGpuPtr, 1, GRAPHICS_POOL);
   fpx3d_vk_allocate_commandbuffers_at_pool(m_LogicalGpuPtr, 0, 4);
   fpx3d_vk_allocate_commandbuffers_at_pool(m_LogicalGpuPtr, 1, 4);
+}
 
+void Renderer::_prepare_framebuffers(void) {
   fpx3d_vk_create_swapchain(&m_VulkanContext, m_LogicalGpuPtr,
                             s_SwapchainRequirements);
   Fpx3d_Vk_Swapchain *sc = fpx3d_vk_get_current_swapchain(m_LogicalGpuPtr);
@@ -480,18 +557,23 @@ static int s_gpu_scoring_function(Fpx3d_Vk_Context *vk_ctx,
   return score * multiplier;
 }
 
-static struct fpx3d_wnd_dimensions s_window_resize_callback(void *window_ptr) {
+static struct fpx3d_wnd_dimensions s_window_size_callback(void *window_ptr) {
   struct fpx3d_wnd_dimensions retval{};
   if (nullptr == window_ptr)
     return retval;
 
-  int w, h;
-  w = h = 0;
+  // fag::Window *cast_ptr = /* setting `cast_ptr` to be this, segfaults when
+  //                          * calling any member function */
+  //     static_cast<fag::Window *>(window_ptr);
 
-  glfwGetWindowSize(static_cast<GLFWwindow *>(window_ptr), &w, &h);
+  fag::Vulkan::Window *cast_ptr = /* this one, doesn't...? */
+      static_cast<fag::Vulkan::Window *>(window_ptr);
 
-  retval.width = w;
-  retval.height = h;
+  struct fag::WindowDimensions dims =
+      cast_ptr->get_dimensions(); /* (here is the aforementioned segfault) */
+
+  retval.width = dims.width;
+  retval.height = dims.height;
 
   return retval;
 }

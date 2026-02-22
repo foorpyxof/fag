@@ -16,11 +16,10 @@ Generic::Generic() : Generic(nullptr) {}
 Generic::Generic(const char *msg) : Generic(msg, nullptr, 0) {}
 Generic::Generic(const char *msg, const char *file, int line) {
   std::ostringstream full_msg;
+  full_msg << ERROR_MESSAGE;
 
   if (nullptr != msg)
-    full_msg << msg;
-  else
-    full_msg << ERROR_MESSAGE;
+    full_msg << "\n" << msg;
 
   if (nullptr != file && line > 0)
     full_msg << "\n(at: " << file << ":" << std::to_string(line) << ")";

@@ -12,12 +12,12 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
-MeshInstance::MeshInstance(void) : m_VulkanShape{} {}
-MeshInstance::MeshInstance(const std::weak_ptr<const fag::Mesh> &base_mesh) {
-  std::shared_ptr<const fag::Mesh> shr_ptr = base_mesh.lock();
+MeshInstance::MeshInstance(
+    const std::weak_ptr<const fag::Vulkan::Mesh> &base_mesh) {
   const fag::Vulkan::Mesh *ptr;
   if (nullptr ==
-      (ptr = dynamic_cast<const fag::Vulkan::Mesh *>(shr_ptr.get()))) {
+      (ptr = dynamic_cast<const fag::Vulkan::Mesh *>(base_mesh.lock().get()))) {
+    // TODO: throw error here
   }
 
   m_VulkanShape = fpx3d_vk_create_shape(&(ptr->get_vulkan_shapebuffer()));

@@ -15,15 +15,16 @@ extern "C" {
 namespace fag {
 namespace Vulkan {
 
+class Mesh;
+
 class MeshInstance : public fag::MeshInstance {
   friend class Renderer;
 
 public:
   virtual ~MeshInstance(void);
 
-public:
-  MeshInstance(void);
-  MeshInstance(const std::weak_ptr<const fag::Mesh> &);
+private:
+  MeshInstance(const std::weak_ptr<const fag::Vulkan::Mesh> &);
 
 private:
   Fpx3d_Vk_Shape m_VulkanShape;

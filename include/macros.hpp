@@ -18,7 +18,10 @@ extern "C" {
 #undef IMPLEMENT_THIS
 #endif
 #define IMPLEMENT_THIS(_func, _body)                                           \
-  _func { _body FAG_TODO("Implement \"%s\"", #_func); }
+  _func {                                                                      \
+    FAG_TODO("Implement \"%s\"", #_func);                                      \
+    _body                                                                      \
+  }
 
 // clang-format off
 #ifdef UNUSED
